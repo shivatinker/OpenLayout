@@ -43,7 +43,7 @@ enum Utils {
     )
     
     static func assertLeafLayout(
-        _ root: any LayoutItemConvertible,
+        _ root: some LayoutItem,
         rect: CGRect = Utils.defaultRect,
         expectedLayout: String,
         file: StaticString = #filePath,
@@ -55,11 +55,14 @@ enum Utils {
         XCTAssertEqual(actualString, expectedString, file: file, line: line)
     }
 
-    private static func getActualLayoutDict(root: any LayoutItemConvertible, rect: CGRect) -> [Int: CGRect] {
+    private static func getActualLayoutDict(
+        root: some LayoutItem,
+        rect: CGRect
+    ) -> [Int: CGRect] {
         let engine = LayoutEngine()
         let result = engine.evaluateLayout(
             in: rect,
-            root: root.layoutItem
+            root: root.makeNode()
         )
         let leafs = result.collectLeafs()
         var layout: [Int: CGRect] = [:]

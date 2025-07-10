@@ -7,7 +7,7 @@
 
 import OpenLayoutCore
 
-public typealias LayoutBuilder = ArrayBuilder<any LayoutItemConvertible>
+public typealias LayoutBuilder = ArrayBuilder<any LayoutItem>
 
 @resultBuilder
 public struct ArrayBuilder<Element> {

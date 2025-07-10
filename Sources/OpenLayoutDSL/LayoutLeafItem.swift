@@ -8,28 +8,14 @@
 import CoreGraphics
 import OpenLayoutCore
 
-public protocol LayoutLeafItem: LayoutItemConvertible {
+public protocol LayoutLeafItem: LayoutItem {
     associatedtype Layout: LeafLayout
     
     var layout: Layout { get }
 }
 
 extension LayoutLeafItem {
-    public var layoutItem: some LayoutItem {
-        Leaf(self)
-    }
-}
-
-private struct Leaf<T: LayoutLeafItem>: LayoutItem {
-    typealias Content = Never
-    
-    private let item: T
-    
-    init(_ item: T) {
-        self.item = item
-    }
-    
-    func makeNode() -> LayoutNode {
-        LayoutNode.makeLeaf(layout: self.item.layout, item: self.item)
+    public func makeNode() -> LayoutNode {
+        LayoutNode.makeLeaf(layout: self.layout, item: self)
     }
 }
