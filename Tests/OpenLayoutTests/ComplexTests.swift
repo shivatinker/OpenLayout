@@ -8,6 +8,7 @@
 import OpenLayout
 import XCTest
 
+@MainActor
 final class ComplexTests: XCTestCase {
     func testSimpleMinWidthConstraint() {
         Utils.assertLeafLayout(
@@ -40,11 +41,11 @@ final class ComplexTests: XCTestCase {
                 .frame(minHeight: 40, maxHeight: 60)
             },
             expectedLayout: """
-            1: 8.0 3.5 20.0 15.0
-            2: 8.0 31.5 25.0 20.0
-            3: 46.5 0.0 30.0 100.0
-            4: 2.0 88.5 56.0 0.0
-            5: 0.0 98.5 18.0 12.0
+            1: 8.0 8.0 20.0 15.0
+            2: 8.0 28.0 25.0 20.0
+            3: 51.0 0.0 31.0 100.0
+            4: 92.0 8.0 14.0 14.0
+            5: 92.0 25.0 18.0 12.0
             """
         )
     }

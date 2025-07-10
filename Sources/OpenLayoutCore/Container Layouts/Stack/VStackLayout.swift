@@ -28,11 +28,19 @@ public struct VStackLayout: Layout {
         in rect: CGRect,
         children: inout [some LayoutElement]
     ) {
-        let childrenPlacements = self.engine.placeChildren(children, in: rect)
+        // Layout as if origin is (0,0)
+        let zeroOriginRect = CGRect(origin: .zero, size: rect.size)
+        let childrenPlacements = self.engine.placeChildren(children, in: zeroOriginRect)
         
         for (index, placement) in childrenPlacements.enumerated() {
+            // Swap back, then translate by rect.origin
+            let swappedPoint = placement.0.swapped()
+            let translatedPoint = CGPoint(
+                x: swappedPoint.x + rect.origin.x,
+                y: swappedPoint.y + rect.origin.y
+            )
             children[index].place(
-                at: placement.0.swapped(),
+                at: translatedPoint,
                 anchor: .topLeft,
                 proposal: placement.1.swapped()
             )

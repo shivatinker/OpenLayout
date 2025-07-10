@@ -8,6 +8,7 @@
 import OpenLayout
 import XCTest
 
+@MainActor
 final class FixedFrameTests: XCTestCase {
     // MARK: - Width Only Tests
     

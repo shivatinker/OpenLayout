@@ -1,6 +1,7 @@
 import OpenLayout
 import XCTest
 
+@MainActor
 final class FlexibleFrameTests: XCTestCase {
     // MARK: - Basic min/max/ideal tests
 

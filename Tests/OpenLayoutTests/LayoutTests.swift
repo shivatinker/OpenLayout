@@ -25,6 +25,7 @@ struct Rectangle: LayoutLeafItem {
     }
 }
 
+@MainActor
 final class LayoutTests: XCTestCase {
     func testSimple() {
         Utils.assertLeafLayout(
@@ -42,6 +43,7 @@ enum Utils {
         size: CGSize(width: 100, height: 100)
     )
     
+    @MainActor
     static func assertLeafLayout(
         _ root: some LayoutItem,
         rect: CGRect = Utils.defaultRect,
@@ -52,7 +54,24 @@ enum Utils {
         let actualDict = self.getActualLayoutDict(root: root, rect: rect)
         let actualString = self.layoutDictToString(actualDict)
         let expectedString = self.normalizeLayoutString(expectedLayout)
-        XCTAssertEqual(actualString, expectedString, file: file, line: line)
+        
+        // Generate visualization image
+        let image = LayoutVisualizer.visualize(root)
+        if let pngData = cgImageToPNGData(image) {
+            let attachment = XCTAttachment(data: pngData, uniformTypeIdentifier: "public.png")
+            attachment.name = "Layout Visualization"
+            attachment.lifetime = .keepAlways
+            XCTContext.runActivity(named: "Attach layout visualization") { activity in
+                activity.add(attachment)
+            }
+        }
+        
+        if actualString != expectedString {
+            XCTFail("Layout mismatch!\nExpected:\n\(expectedString)\nActual:\n\(actualString)", file: file, line: line)
+        }
+        else {
+            XCTAssertEqual(actualString, expectedString, file: file, line: line)
+        }
     }
 
     private static func getActualLayoutDict(
@@ -86,5 +105,14 @@ enum Utils {
             .map { $0.trimmingCharacters(in: .whitespaces) }
             .filter { !$0.isEmpty }
             .joined(separator: "\n")
+    }
+
+    // Helper to convert CGImage to PNG Data
+    private static func cgImageToPNGData(_ image: CGImage) -> Data? {
+        let data = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(data, "public.png" as CFString, 1, nil) else { return nil }
+        CGImageDestinationAddImage(destination, image, nil)
+        guard CGImageDestinationFinalize(destination) else { return nil }
+        return data as Data
     }
 }

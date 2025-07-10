@@ -8,6 +8,7 @@
 import OpenLayout
 import XCTest
 
+@MainActor
 final class HStackLayoutTests: XCTestCase {
     func testBasicHStack() {
         Utils.assertLeafLayout(

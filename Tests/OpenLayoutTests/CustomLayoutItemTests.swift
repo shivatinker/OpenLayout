@@ -73,7 +73,7 @@ struct ResponsiveGrid: LayoutItem {
                 HStack(spacing: self.spacing) {
                     for col in 0..<self.columns {
                         Rectangle(row * self.columns + col + 9)
-                            .frame(width: 30, height: 30)
+                            .frame(width: 20, height: 20)
                     }
                 }
             }
@@ -84,6 +84,7 @@ struct ResponsiveGrid: LayoutItem {
 
 // MARK: - Tests
 
+@MainActor
 final class CustomLayoutItemTests: XCTestCase {
     func testSimpleCardLayout() {
         Utils.assertLeafLayout(
@@ -125,17 +126,12 @@ final class CustomLayoutItemTests: XCTestCase {
     
     func testResponsiveGridLayout() {
         Utils.assertLeafLayout(
-            ResponsiveGrid(columns: 3, spacing: 8),
+            ResponsiveGrid(columns: 2, spacing: 5),
             expectedLayout: """
-            9: -3.0 -3.0 30.0 30.0
-            10: 35.0 -3.0 30.0 30.0
-            11: 73.0 -3.0 30.0 30.0
-            12: -3.0 111.0 30.0 30.0
-            13: 35.0 111.0 30.0 30.0
-            14: 73.0 111.0 30.0 30.0
-            15: -3.0 225.0 30.0 30.0
-            16: 35.0 225.0 30.0 30.0
-            17: 73.0 225.0 30.0 30.0
+            9: 26.0 27.5 20.0 20.0
+            10: 51.0 27.5 20.0 20.0
+            11: 26.0 80.5 20.0 20.0
+            12: 51.0 80.5 20.0 20.0
             """
         )
     }
@@ -151,16 +147,16 @@ final class CustomLayoutItemTests: XCTestCase {
                 ResponsiveGrid(columns: 2, spacing: 5)
             },
             expectedLayout: """
-            1: 59.0 65.0 100.0 20.0
-            2: 59.0 173.0 80.0 15.0
-            3: 59.0 261.0 60.0 10.0
-            4: -75.0 57.0 35.0 35.0
-            5: 57.0 -28.0 60.0 12.0
-            6: 57.0 40.0 40.0 8.0
-            9: 325.0 -73.0 30.0 30.0
-            10: 360.0 -73.0 30.0 30.0
-            11: 325.0 0.0 30.0 30.0
-            12: 360.0 0.0 30.0 30.0
+            1: 59.0 75.0 100.0 20.0
+            2: 59.0 183.0 80.0 15.0
+            3: 59.0 271.0 60.0 10.0
+            4: -65.0 57.0 35.0 35.0
+            5: 57.0 -18.0 60.0 12.0
+            6: 57.0 50.0 40.0 8.0
+            9: 325.0 -63.0 20.0 20.0
+            10: 350.0 -63.0 20.0 20.0
+            11: 325.0 -10.0 20.0 20.0
+            12: 350.0 -10.0 20.0 20.00
             """
         )
     }

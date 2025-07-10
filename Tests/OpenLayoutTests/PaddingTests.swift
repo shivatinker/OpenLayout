@@ -1,6 +1,7 @@
 import OpenLayout
 import XCTest
 
+@MainActor
 final class PaddingTests: XCTestCase {
     // MARK: - Basic padding tests
     

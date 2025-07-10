@@ -8,6 +8,7 @@
 import OpenLayout
 import XCTest
 
+@MainActor
 final class VStackLayoutTests: XCTestCase {
     func testBasicVStack() {
         Utils.assertLeafLayout(

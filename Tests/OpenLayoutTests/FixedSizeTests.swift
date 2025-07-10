@@ -1,6 +1,7 @@
 import OpenLayout
 import XCTest
 
+@MainActor
 final class FixedSizeTests: XCTestCase {
     func testFixedSizeBoth() {
         Utils.assertLeafLayout(
