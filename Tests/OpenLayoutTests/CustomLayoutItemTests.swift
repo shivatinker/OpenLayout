@@ -10,75 +10,104 @@ import XCTest
 
 // MARK: - Custom Composite Layout Items
 
-struct Card: LayoutItem {
+private struct Card: LayoutItem {
     let title: String
     let backgroundColor: String
     
     var body: some LayoutItem {
-        VStack(spacing: 8) {
-            Rectangle(1).frame(width: 100, height: 20)
-            Rectangle(2).frame(width: 80, height: 15)
-            Rectangle(3).frame(width: 60, height: 10)
+        VStack(alignment: .center, spacing: 2) {
+            Rectangle(1).frame(width: 30, height: 8)
+            Rectangle(2).frame(width: 25, height: 6)
+            Rectangle(3).frame(width: 20, height: 4)
         }
-        .padding(10)
-        .frame(minWidth: 120, maxWidth: 150, minHeight: 80, maxHeight: 120)
+        .padding(3)
+        .frame(minWidth: 36, maxWidth: 40, minHeight: 25, maxHeight: 30)
     }
 }
 
-struct ProfileCard: LayoutItem {
+private struct ProfileCard: LayoutItem {
     let name: String
     let avatarSize: CGFloat
     
     var body: some LayoutItem {
-        HStack(spacing: 12) {
+        HStack(alignment: .center, spacing: 4) {
             Rectangle(4).frame(width: self.avatarSize, height: self.avatarSize)
             
-            VStack(spacing: 4) {
-                Rectangle(5).frame(width: 60, height: 12)
-                Rectangle(6).frame(width: 40, height: 8)
+            VStack(alignment: .left, spacing: 2) {
+                Rectangle(5).frame(width: 20, height: 5)
+                Rectangle(6).frame(width: 15, height: 3)
             }
         }
-        .padding(8)
-        .frame(minWidth: 100, maxWidth: 200)
+        .padding(2)
+        .frame(minWidth: 30, maxWidth: 50)
     }
 }
 
-struct Dashboard: LayoutItem {
+private struct Dashboard: LayoutItem {
     let showHeader: Bool
     
     var body: some LayoutItem {
-        VStack(spacing: 16) {
+        VStack(alignment: .center, spacing: 4) {
             if self.showHeader {
-                Rectangle(7).frame(width: 200, height: 30)
+                Rectangle(7).frame(width: 60, height: 10)
             }
             
-            HStack(spacing: 20) {
+            HStack(alignment: .top, spacing: 6) {
                 Card(title: "Stats", backgroundColor: "blue")
-                ProfileCard(name: "John", avatarSize: 40)
+                ProfileCard(name: "John", avatarSize: 12)
             }
             
-            Rectangle(8).frame(width: 180, height: 25)
+            Rectangle(8).frame(width: 50, height: 8)
         }
-        .padding(16)
+        .padding(4)
     }
 }
 
-struct ResponsiveGrid: LayoutItem {
+private struct ResponsiveGrid: LayoutItem {
     let columns: Int
     let spacing: CGFloat
     
     var body: some LayoutItem {
-        VStack(spacing: self.spacing) {
+        VStack(alignment: .center, spacing: self.spacing) {
             for row in 0..<self.columns {
-                HStack(spacing: self.spacing) {
+                HStack(alignment: .center, spacing: self.spacing) {
                     for col in 0..<self.columns {
                         Rectangle(row * self.columns + col + 9)
-                            .frame(width: 20, height: 20)
+                            .frame(width: 8, height: 8)
                     }
                 }
             }
         }
-        .padding(10)
+        .padding(3)
+    }
+}
+
+private struct AlignedCard: LayoutItem {
+    let alignment: Alignment
+    
+    var body: some LayoutItem {
+        VStack(alignment: .center, spacing: 2) {
+            Rectangle(1).frame(width: 30, height: 8)
+            Rectangle(2).frame(width: 25, height: 6)
+            Rectangle(3).frame(width: 20, height: 4)
+        }
+        .frame(width: 40, height: 30, alignment: self.alignment)
+    }
+}
+
+private struct AlignedProfile: LayoutItem {
+    let alignment: Alignment
+    
+    var body: some LayoutItem {
+        HStack(alignment: .center, spacing: 4) {
+            Rectangle(4).frame(width: 15, height: 15)
+            
+            VStack(alignment: .left, spacing: 2) {
+                Rectangle(5).frame(width: 20, height: 5)
+                Rectangle(6).frame(width: 15, height: 3)
+            }
+        }
+        .frame(width: 45, height: 25, alignment: self.alignment)
     }
 }
 
@@ -90,20 +119,20 @@ final class CustomLayoutItemTests: XCTestCase {
         Utils.assertLeafLayout(
             Card(title: "Test Card", backgroundColor: "red"),
             expectedLayout: """
-            1: 19.5 0.0 100.0 20.0
-            2: 19.5 108.0 80.0 15.0
-            3: 19.5 196.0 60.0 10.0
+            1: 35.0 39.0 30.0 8.0
+            2: 37.5 49.0 25.0 6.0
+            3: 40.0 57.0 20.0 4.0
             """
         )
     }
     
     func testProfileCardLayout() {
         Utils.assertLeafLayout(
-            ProfileCard(name: "Alice", avatarSize: 50),
+            ProfileCard(name: "Alice", avatarSize: 15),
             expectedLayout: """
-            4: -11.0 25.0 50.0 50.0
-            5: 25.0 51.0 60.0 12.0
-            6: 25.0 119.0 40.0 8.0
+            4: 30.5 42.5 15.0 15.0
+            5: 49.5 45.0 20.0 5.0
+            6: 49.5 52.0 15.0 3.0
             """
         )
     }
@@ -112,51 +141,234 @@ final class CustomLayoutItemTests: XCTestCase {
         Utils.assertLeafLayout(
             Dashboard(showHeader: true),
             expectedLayout: """
-            1: 134.0 -16.0 100.0 20.0
-            2: 134.0 92.0 80.0 15.0
-            3: 134.0 180.0 60.0 10.0
-            4: 122.0 132.0 40.0 40.0
-            5: 132.0 174.0 60.0 12.0
-            6: 132.0 242.0 40.0 8.0
-            7: -26.0 -84.0 200.0 30.0
-            8: -26.0 400.0 180.0 25.0
+            1: 12.0 40.0 30.0 8.0
+            2: 14.5 50.0 25.0 6.0
+            3: 17.0 58.0 20.0 4.0
+            4: 53.0 39.0 12.0 12.0
+            5: 69.0 40.0 20.0 5.0
+            6: 69.0 47.0 15.0 3.0
+            7: 20.0 23.0 60.0 10.0
+            8: 25.0 69.0 50.0 8.0
             """
         )
     }
     
     func testResponsiveGridLayout() {
         Utils.assertLeafLayout(
-            ResponsiveGrid(columns: 2, spacing: 5),
+            ResponsiveGrid(columns: 2, spacing: 2),
             expectedLayout: """
-            9: 26.0 27.5 20.0 20.0
-            10: 51.0 27.5 20.0 20.0
-            11: 26.0 80.5 20.0 20.0
-            12: 51.0 80.5 20.0 20.0
+            9: 41.0 41.0 8.0 8.0
+            10: 51.0 41.0 8.0 8.0
+            11: 41.0 51.0 8.0 8.0
+            12: 51.0 51.0 8.0 8.0
             """
         )
     }
     
     func testNestedCustomLayoutItems() {
         Utils.assertLeafLayout(
-            VStack(spacing: 20) {
+            VStack(alignment: .center, spacing: 6) {
                 Card(title: "First", backgroundColor: "green")
-                HStack(spacing: 15) {
-                    ProfileCard(name: "Bob", avatarSize: 35)
+                HStack(alignment: .center, spacing: 4) {
+                    ProfileCard(name: "Bob", avatarSize: 10)
                     Card(title: "Second", backgroundColor: "purple")
                 }
-                ResponsiveGrid(columns: 2, spacing: 5)
+                ResponsiveGrid(columns: 2, spacing: 2)
             },
             expectedLayout: """
-            1: 59.0 75.0 100.0 20.0
-            2: 59.0 183.0 80.0 15.0
-            3: 59.0 271.0 60.0 10.0
-            4: -65.0 57.0 35.0 35.0
-            5: 57.0 -18.0 60.0 12.0
-            6: 57.0 50.0 40.0 8.0
-            9: 325.0 -63.0 20.0 20.0
-            10: 350.0 -63.0 20.0 20.0
-            11: 325.0 -10.0 20.0 20.0
-            12: 350.0 -10.0 20.0 20.00
+            1: 56.0 41.0 30.0 8.0
+            2: 58.5 51.0 25.0 6.0
+            3: 61.0 59.0 20.0 4.0
+            4: 13.0 47.0 10.0 10.0
+            5: 27.0 47.0 20.0 5.0
+            6: 27.0 54.0 15.0 3.0
+            9: 41.0 75.0 8.0 8.0
+            10: 51.0 75.0 8.0 8.0
+            11: 41.0 85.0 8.0 8.0
+            12: 51.0 85.0 8.0 8.0
+            """
+        )
+    }
+    
+    // MARK: - Alignment Tests
+    
+    func testVStackAlignments() {
+        // Test VStack with different alignments
+        Utils.assertLeafLayout(
+            VStack(alignment: .left, spacing: 4) {
+                Rectangle(1).frame(width: 20, height: 10)
+                Rectangle(2).frame(width: 30, height: 8)
+                Rectangle(3).frame(width: 15, height: 12)
+            }
+            .frame(width: 50, height: 40),
+            expectedLayout: """
+            1: 35.0 31.0 20.0 10.0
+            2: 35.0 45.0 30.0 8.0
+            3: 35.0 57.0 15.0 12.0
+            """
+        )
+        
+        Utils.assertLeafLayout(
+            VStack(alignment: .center, spacing: 4) {
+                Rectangle(1).frame(width: 20, height: 10)
+                Rectangle(2).frame(width: 30, height: 8)
+                Rectangle(3).frame(width: 15, height: 12)
+            }
+            .frame(width: 50, height: 40),
+            expectedLayout: """
+            1: 40.0 31.0 20.0 10.0
+            2: 35.0 45.0 30.0 8.0
+            3: 42.5 57.0 15.0 12.0
+            """
+        )
+        
+        Utils.assertLeafLayout(
+            VStack(alignment: .right, spacing: 4) {
+                Rectangle(1).frame(width: 20, height: 10)
+                Rectangle(2).frame(width: 30, height: 8)
+                Rectangle(3).frame(width: 15, height: 12)
+            }
+            .frame(width: 50, height: 40),
+            expectedLayout: """
+            1: 45.0 31.0 20.0 10.0
+            2: 35.0 45.0 30.0 8.0
+            3: 50.0 57.0 15.0 12.0
+            """
+        )
+    }
+    
+    func testHStackAlignments() {
+        // Test HStack with different alignments
+        Utils.assertLeafLayout(
+            HStack(alignment: .top, spacing: 4) {
+                Rectangle(1).frame(width: 15, height: 20)
+                Rectangle(2).frame(width: 20, height: 15)
+                Rectangle(3).frame(width: 10, height: 25)
+            }
+            .frame(width: 50, height: 30),
+            expectedLayout: """
+            1: 23.5 37.5 15.0 20.0
+            2: 42.5 37.5 20.0 15.0
+            3: 66.5 37.5 10.0 25.0
+            """
+        )
+        
+        Utils.assertLeafLayout(
+            HStack(alignment: .center, spacing: 4) {
+                Rectangle(1).frame(width: 15, height: 20)
+                Rectangle(2).frame(width: 20, height: 15)
+                Rectangle(3).frame(width: 10, height: 25)
+            }
+            .frame(width: 50, height: 30),
+            expectedLayout: """
+            1: 23.5 40.0 15.0 20.0
+            2: 42.5 42.5 20.0 15.0
+            3: 66.5 37.5 10.0 25.0
+            """
+        )
+        
+        Utils.assertLeafLayout(
+            HStack(alignment: .bottom, spacing: 4) {
+                Rectangle(1).frame(width: 15, height: 20)
+                Rectangle(2).frame(width: 20, height: 15)
+                Rectangle(3).frame(width: 10, height: 25)
+            }
+            .frame(width: 50, height: 30),
+            expectedLayout: """
+            1: 23.5 42.5 15.0 20.0
+            2: 42.5 47.5 20.0 15.0
+            3: 66.5 37.5 10.0 25.0
+            """
+        )
+    }
+    
+    func testAlignedCardLayouts() {
+        // Test cards with different frame alignments
+        Utils.assertLeafLayout(
+            AlignedCard(alignment: .topLeft),
+            expectedLayout: """
+            1: 30.0 35.0 30.0 8.0
+            2: 32.5 45.0 25.0 6.0
+            3: 35.0 53.0 20.0 4.0
+            """
+        )
+        
+        Utils.assertLeafLayout(
+            AlignedCard(alignment: .center),
+            expectedLayout: """
+            1: 35.0 39.0 30.0 8.0
+            2: 37.5 49.0 25.0 6.0
+            3: 40.0 57.0 20.0 4.0
+            """
+        )
+        
+        Utils.assertLeafLayout(
+            AlignedCard(alignment: .bottomRight),
+            expectedLayout: """
+            1: 40.0 43.0 30.0 8.0
+            2: 42.5 53.0 25.0 6.0
+            3: 45.0 61.0 20.0 4.0
+            """
+        )
+    }
+    
+    func testAlignedProfileLayouts() {
+        // Test profiles with different frame alignments
+        Utils.assertLeafLayout(
+            AlignedProfile(alignment: .topLeft),
+            expectedLayout: """
+            4: 27.5 37.5 15.0 15.0
+            5: 46.5 40.0 20.0 5.0
+            6: 46.5 47.0 15.0 3.0
+            """
+        )
+        
+        Utils.assertLeafLayout(
+            AlignedProfile(alignment: .center),
+            expectedLayout: """
+            4: 30.5 42.5 15.0 15.0
+            5: 49.5 45.0 20.0 5.0
+            6: 49.5 52.0 15.0 3.0
+            """
+        )
+        
+        Utils.assertLeafLayout(
+            AlignedProfile(alignment: .bottomRight),
+            expectedLayout: """
+            4: 33.5 47.5 15.0 15.0
+            5: 52.5 50.0 20.0 5.0
+            6: 52.5 57.0 15.0 3.0
+            """
+        )
+    }
+    
+    func testMixedAlignmentLayout() {
+        // Test complex layout with mixed alignments
+        Utils.assertLeafLayout(
+            VStack(alignment: .left, spacing: 6) {
+                HStack(alignment: .top, spacing: 4) {
+                    Rectangle(1).frame(width: 12, height: 15)
+                    Rectangle(2).frame(width: 18, height: 10)
+                }
+                
+                HStack(alignment: .center, spacing: 4) {
+                    Rectangle(3).frame(width: 15, height: 12)
+                    Rectangle(4).frame(width: 20, height: 8)
+                }
+                
+                HStack(alignment: .bottom, spacing: 4) {
+                    Rectangle(5).frame(width: 10, height: 18)
+                    Rectangle(6).frame(width: 16, height: 14)
+                }
+            }
+            .frame(width: 40, height: 50),
+            expectedLayout: """
+            1: 30.5 21.5 12.0 15.0
+            2: 46.5 21.5 18.0 10.0
+            3: 30.5 42.5 15.0 12.0
+            4: 49.5 44.5 20.0 8.0
+            5: 30.5 60.5 10.0 18.0
+            6: 44.5 64.5 16.0 14.0
             """
         )
     }

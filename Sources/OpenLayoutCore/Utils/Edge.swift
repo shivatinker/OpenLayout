@@ -3,6 +3,16 @@ import CoreGraphics
 public enum Axis {
     case horizontal
     case vertical
+    
+    var crossAxis: Axis {
+        switch self {
+        case .horizontal:
+            .vertical
+            
+        case .vertical:
+            .horizontal
+        }
+    }
 }
 
 public enum Edge: Int8, CaseIterable {

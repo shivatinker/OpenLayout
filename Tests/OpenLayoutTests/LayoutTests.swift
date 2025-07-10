@@ -55,19 +55,25 @@ enum Utils {
         let actualString = self.layoutDictToString(actualDict)
         let expectedString = self.normalizeLayoutString(expectedLayout)
         
-        // Generate visualization image
-        let image = LayoutVisualizer.visualize(root)
-        if let pngData = cgImageToPNGData(image) {
-            let attachment = XCTAttachment(data: pngData, uniformTypeIdentifier: "public.png")
-            attachment.name = "Layout Visualization"
-            attachment.lifetime = .keepAlways
-            XCTContext.runActivity(named: "Attach layout visualization") { activity in
-                activity.add(attachment)
-            }
-        }
-        
         if actualString != expectedString {
-            XCTFail("Layout mismatch!\nExpected:\n\(expectedString)\nActual:\n\(actualString)", file: file, line: line)
+            // Generate visualization image
+            let image = LayoutVisualizer.visualize(root)
+            if let pngData = cgImageToPNGData(image) {
+                let attachment = XCTAttachment(data: pngData, uniformTypeIdentifier: "public.png")
+                attachment.name = "Layout Visualization"
+                attachment.lifetime = .keepAlways
+                XCTContext.runActivity(named: "Attach layout visualization") { activity in
+                    activity.add(attachment)
+                }
+            }
+            
+            XCTFail("""
+            Layout mismatch!
+            Expected:
+            \(expectedString)
+            Actual:
+            \(actualString)
+            """, file: file, line: line)
         }
         else {
             XCTAssertEqual(actualString, expectedString, file: file, line: line)

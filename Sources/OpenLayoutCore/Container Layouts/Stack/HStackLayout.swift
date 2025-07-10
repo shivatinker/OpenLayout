@@ -10,8 +10,23 @@ import CoreGraphics
 public struct HStackLayout: Layout {
     private let engine: StackLayoutEngine
     
-    public init(spacing: CGFloat = 8) {
-        self.engine = StackLayoutEngine(spacing: spacing)
+    public init(alignment: Alignment.Vertical = .center, spacing: CGFloat = 8) {
+        let stackAlignment: StackAlignment = {
+            switch alignment {
+            case .top:
+                return .min
+            case .center:
+                return .center
+            case .bottom:
+                return .max
+            }
+        }()
+        
+        self.engine = StackLayoutEngine(
+            spacing: spacing,
+            axis: .horizontal,
+            alignment: stackAlignment
+        )
     }
     
     public func sizeThatFits(
@@ -25,14 +40,6 @@ public struct HStackLayout: Layout {
         in rect: CGRect,
         children: inout [some LayoutElement]
     ) {
-        let childrenPlacements = self.engine.placeChildren(children, in: rect)
-        
-        for (index, placement) in childrenPlacements.enumerated() {
-            children[index].place(
-                at: placement.0,
-                anchor: .topLeft,
-                proposal: placement.1
-            )
-        }
+        self.engine.placeChildren(&children, in: rect)
     }
 }

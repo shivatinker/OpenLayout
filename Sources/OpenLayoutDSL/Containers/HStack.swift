@@ -12,12 +12,14 @@ public struct HStack: Container {
     public typealias Layout = HStackLayout
     
     private let spacing: CGFloat
+    private let alignment: Alignment.Vertical
     
-    public init(spacing: CGFloat = 8) {
+    public init(alignment: Alignment.Vertical = .center, spacing: CGFloat = 8) {
         self.spacing = spacing
+        self.alignment = alignment
     }
     
     public func makeLayout() -> HStackLayout {
-        HStackLayout(spacing: self.spacing)
+        HStackLayout(alignment: self.alignment, spacing: self.spacing)
     }
 }

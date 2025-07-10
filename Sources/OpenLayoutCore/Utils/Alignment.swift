@@ -13,7 +13,7 @@ public struct AnchorPoint {
 }
 
 public struct Alignment: Sendable {
-    enum Vertical {
+    public enum Vertical: Sendable {
         case top
         case center
         case bottom
@@ -30,7 +30,7 @@ public struct Alignment: Sendable {
         }
     }
     
-    enum Horizontal {
+    public enum Horizontal: Sendable {
         case left
         case center
         case right

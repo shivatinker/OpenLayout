@@ -104,23 +104,18 @@ enum LayoutVisualizer {
             
             // Draw rectangle ID
             let idString = "\(rectangle.id)"
-            let font = CTFontCreateWithName("Helvetica" as CFString, 12, nil)
+            let font = CTFontCreateWithName("Helvetica" as CFString, 8, nil)
             let attributes: [NSAttributedString.Key: Any] = [
                 .font: font,
                 .foregroundColor: CGColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0),
             ]
-            
             let attributedString = NSAttributedString(string: idString, attributes: attributes)
             let line = CTLineCreateWithAttributedString(attributedString)
-            
-            let textRect = CGRect(
-                x: adjustedRect.midX - 6,
-                y: adjustedRect.midY - 6,
-                width: 12,
-                height: 12
-            )
-            
-            context.textPosition = CGPoint(x: textRect.minX, y: textRect.minY)
+            let bounds = CTLineGetBoundsWithOptions(line, .useOpticalBounds)
+            // Center the text in the rectangle
+            let textX = adjustedRect.midX - bounds.width / 2 - bounds.origin.x
+            let textY = adjustedRect.midY - bounds.height / 2 - bounds.origin.y
+            context.textPosition = CGPoint(x: textX, y: textY)
             CTLineDraw(line, context)
         }
         
