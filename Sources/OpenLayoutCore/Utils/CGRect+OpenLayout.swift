@@ -38,4 +38,15 @@ extension CGRect {
             y: self.midY
         )
     }
+    
+    func inset(edges: Edge.Set, _ inset: CGFloat) -> CGRect {
+        let size = self.size.inset(edges: edges, inset)
+        
+        let origin = CGPoint(
+            x: self.origin.x + (edges.contains(.left) ? inset : 0),
+            y: self.origin.y + (edges.contains(.top) ? inset : 0)
+        )
+        
+        return CGRect(origin: origin, size: size)
+    }
 }
