@@ -24,7 +24,19 @@ extension Container {
     }
 }
 
-private struct ContainerItem<Layout: OpenLayoutCore.Layout>: LayoutItem {
+struct UnaryContainerItem<Layout: UnaryLayout>: LayoutItem {
+    let layout: Layout
+    let child: any LayoutItem
+    
+    func makeNode() -> LayoutNode {
+        LayoutNode.makeUnaryContainer(
+            layout: self.layout,
+            child: self.child.makeNode()
+        )
+    }
+}
+
+struct ContainerItem<Layout: OpenLayoutCore.Layout>: LayoutItem {
     let layout: Layout
     let children: [any LayoutItem]
     
@@ -33,9 +45,5 @@ private struct ContainerItem<Layout: OpenLayoutCore.Layout>: LayoutItem {
             layout: self.layout,
             children: self.children.map { $0.makeNode() }
         )
-    }
-    
-    var layoutItem: some LayoutItem {
-        self
     }
 }

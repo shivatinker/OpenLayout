@@ -8,7 +8,7 @@
 import CoreFoundation
 
 public protocol UnaryLayout {
-    func sizeThatFits(_ size: ProposedSize, child: some LayoutSizeProvider) -> CGSize
+    func sizeThatFits(_ proposal: ProposedSize, child: some LayoutSizeProvider) -> CGSize
     func placeChild(in rect: CGRect, child: inout some LayoutElement)
 }
 
@@ -21,13 +21,13 @@ extension UnaryLayout {
 private struct UnaryLayoutAdapter: Layout {
     let layout: UnaryLayout
     
-    func sizeThatFits(_ proposition: ProposedSize, children: [some LayoutSizeProvider]) -> CGSize {
+    func sizeThatFits(_ proposal: ProposedSize, children: [some LayoutSizeProvider]) -> CGSize {
         guard let child = children.onlyElement else {
             assertionFailure()
             return .zero
         }
         
-        return self.layout.sizeThatFits(proposition, child: child)
+        return self.layout.sizeThatFits(proposal, child: child)
     }
     
     func placeChildren(in rect: CGRect, children: inout [some LayoutElement]) {

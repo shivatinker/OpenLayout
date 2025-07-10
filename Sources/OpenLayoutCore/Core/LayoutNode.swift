@@ -100,4 +100,14 @@ public struct LayoutNode {
             children: children
         )
     }
+    
+    public static func makeUnaryContainer(
+        layout: some UnaryLayout,
+        child: LayoutNode
+    ) -> Self {
+        self.init(
+            layout: layout.makeAdapter(),
+            children: [child]
+        )
+    }
 }
