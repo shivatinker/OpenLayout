@@ -34,4 +34,4 @@ public struct FixedSizeLayout: UnaryLayout {
         }
         return childProposal
     }
-} 
+}

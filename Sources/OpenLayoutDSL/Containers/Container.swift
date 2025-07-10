@@ -7,7 +7,7 @@
 
 import OpenLayoutCore
 
-protocol Container {
+public protocol Container {
     associatedtype Layout: OpenLayoutCore.Layout
     
     func makeLayout() -> Layout
