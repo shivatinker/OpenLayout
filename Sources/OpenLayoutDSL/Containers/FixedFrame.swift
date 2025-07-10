@@ -8,13 +8,6 @@
 import OpenLayoutCore
 
 extension LayoutItem {
-    @available(*, unavailable, message: "Provide one of width or height")
-    public func frame(
-        alignment: Alignment = .center
-    ) -> some LayoutItem {
-        fatalError("Provide one of width or height")
-    }
-    
     @_disfavoredOverload
     public func frame(
         width: CGFloat? = nil,
