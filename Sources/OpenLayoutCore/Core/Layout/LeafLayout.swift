@@ -20,9 +20,9 @@ extension LeafLayout {
 private struct LeafLayoutAdapter: Layout {
     let layout: LeafLayout
    
-    func sizeThatFits(_ size: ProposedSize, children: [some LayoutSizeProvider]) -> CGSize {
+    func sizeThatFits(_ proposition: ProposedSize, children: [some LayoutSizeProvider]) -> CGSize {
         assert(children.isEmpty)
-        return self.layout.sizeThatFits(size)
+        return self.layout.sizeThatFits(proposition)
     }
     
     func placeChildren(in rect: CGRect, children: inout [some LayoutElement]) {

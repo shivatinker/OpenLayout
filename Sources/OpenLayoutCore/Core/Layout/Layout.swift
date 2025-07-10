@@ -30,6 +30,6 @@ public protocol LayoutElement: LayoutSizeProvider {
 }
 
 public protocol Layout {
-    func sizeThatFits(_ size: ProposedSize, children: [some LayoutSizeProvider]) -> CGSize
+    func sizeThatFits(_ proposition: ProposedSize, children: [some LayoutSizeProvider]) -> CGSize
     func placeChildren(in rect: CGRect, children: inout [some LayoutElement])
 }

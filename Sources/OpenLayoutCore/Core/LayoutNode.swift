@@ -7,10 +7,19 @@
 
 import CoreGraphics
 
-public struct LayoutNode: LayoutSizeProvider {
-    let layout: Layout
+public struct LayoutNode {
+    private let layout: Layout
+    private let children: [LayoutNode]
+    
     let leafItem: Any?
-    let children: [LayoutNode]
+    
+    private struct SizeProviderAdapter: LayoutSizeProvider {
+        let node: LayoutNode
+        
+        func sizeThatFits(_ size: ProposedSize) -> CGSize {
+            self.node.sizeThatFits(size)
+        }
+    }
     
     private struct ChildElement: LayoutElement {
         let node: LayoutNode
@@ -26,8 +35,11 @@ public struct LayoutNode: LayoutSizeProvider {
         }
     }
     
-    public func sizeThatFits(_ size: ProposedSize) -> CGSize {
-        self.layout.sizeThatFits(size, children: self.children)
+    private func sizeThatFits(_ size: ProposedSize) -> CGSize {
+        self.layout.sizeThatFits(
+            size,
+            children: self.children.map(SizeProviderAdapter.init(node:))
+        )
     }
     
     func layout(
@@ -56,6 +68,8 @@ public struct LayoutNode: LayoutSizeProvider {
             }
         }
     }
+    
+    // MARK: Constructors
     
     private init(
         layout: Layout,

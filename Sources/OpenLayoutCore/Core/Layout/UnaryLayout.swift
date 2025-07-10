@@ -21,13 +21,13 @@ extension UnaryLayout {
 private struct UnaryLayoutAdapter: Layout {
     let layout: UnaryLayout
     
-    func sizeThatFits(_ size: ProposedSize, children: [some LayoutSizeProvider]) -> CGSize {
+    func sizeThatFits(_ proposition: ProposedSize, children: [some LayoutSizeProvider]) -> CGSize {
         guard let child = children.onlyElement else {
             assertionFailure()
             return .zero
         }
         
-        return self.layout.sizeThatFits(size, child: child)
+        return self.layout.sizeThatFits(proposition, child: child)
     }
     
     func placeChildren(in rect: CGRect, children: inout [some LayoutElement]) {
