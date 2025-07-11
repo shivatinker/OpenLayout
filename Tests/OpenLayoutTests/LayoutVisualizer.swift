@@ -79,15 +79,10 @@ enum LayoutVisualizer {
         
         // Evaluate layout
         let engine = LayoutEngine()
-        let result = engine.evaluateLayout(
+        engine.layout(
             in: CGRect(origin: .zero, size: self.canvasSize),
             root: layout.makeNode()
-        )
-        
-        // Draw rectangles
-        let items = result.items
-        
-        for item in items {
+        ) { item in
             let adjustedRect = CGRect(
                 x: item.rect.origin.x + self.padding,
                 y: item.rect.origin.y + self.padding,

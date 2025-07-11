@@ -66,7 +66,7 @@ public struct LayoutNode {
         at point: AnchorPoint,
         proposition: ProposedSize,
         attributes: NodeAttributes,
-        result: inout EvaluatedLayout
+        visitor: (EvaluatedItem) -> Void
     ) {
         let childAttributes = attributes.merge(with: self.attributes)
         
@@ -74,7 +74,13 @@ public struct LayoutNode {
             let selfSize = self.sizeThatFits(proposition)
             let selfRect = CGRect(anchorPoint: point, size: selfSize)
             
-            result.add(node: self, attributes: attributes, rect: selfRect)
+            visitor(
+                EvaluatedItem(
+                    node: self,
+                    attributes: childAttributes,
+                    rect: selfRect
+                )
+            )
             
             var childrenElements = self.children.map {
                 ChildElement(node: $0, rect: nil)
@@ -88,7 +94,7 @@ public struct LayoutNode {
                         at: AnchorPoint(point: rect.center, alignment: .center),
                         proposition: ProposedSize(rect.size),
                         attributes: childAttributes,
-                        result: &result
+                        visitor: visitor
                     )
                 }
             }

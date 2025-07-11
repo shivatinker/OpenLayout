@@ -10,24 +10,20 @@ import CoreGraphics
 public struct LayoutEngine {
     public init() {}
     
-    public func evaluateLayout(
+    public func layout(
         in rect: CGRect,
-        root: LayoutNode
-    ) -> EvaluatedLayout {
+        root: LayoutNode,
+        visitor: (EvaluatedItem) -> Void
+    ) {
         let proposedSize = ProposedSize(rect.size)
-        
-        var result = EvaluatedLayout()
-        
         let anchorPoint = AnchorPoint(point: rect.center, alignment: .center)
         
         root.layout(
             at: anchorPoint,
             proposition: proposedSize,
             attributes: NodeAttributes(),
-            result: &result
+            visitor: visitor
         )
-        
-        return result
     }
 }
 
@@ -38,14 +34,4 @@ public struct EvaluatedItem {
     public let attributes: NodeAttributes
     
     public let rect: CGRect
-}
-
-public struct EvaluatedLayout {
-    public private(set) var items: [EvaluatedItem] = []
-    
-    init() {}
-    
-    mutating func add(node: LayoutNode, attributes: NodeAttributes, rect: CGRect) {
-        self.items.append(EvaluatedItem(node: node, attributes: attributes, rect: rect))
-    }
 }

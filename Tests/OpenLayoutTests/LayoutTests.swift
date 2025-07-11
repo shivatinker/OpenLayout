@@ -98,20 +98,18 @@ enum Utils {
     ) -> [Int: CGRect] {
         let engine = LayoutEngine()
         
-        let result = engine.evaluateLayout(
-            in: rect,
-            root: root.makeNode()
-        )
-        
         var layout: [Int: CGRect] = [:]
         
-        for item in result.items {
+        engine.layout(
+            in: rect,
+            root: root.makeNode()
+        ) { item in
             guard item.node.leafItem != nil else {
-                continue
+                return
             }
             
             guard let id = item.attributes.value(for: IDNodeAttributeKey.self) else {
-                continue
+                return
             }
             
             layout[id] = item.rect

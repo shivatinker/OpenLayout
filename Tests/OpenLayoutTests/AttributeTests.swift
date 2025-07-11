@@ -38,12 +38,13 @@ final class AttributeTests: XCTestCase {
         
         let engine = LayoutEngine()
         
-        _ = engine.evaluateLayout(
+        engine.layout(
             in: CGRect(
                 origin: .zero,
                 size: CGSize(width: 100, height: 100)
             ),
-            root: root.makeNode()
+            root: root.makeNode(),
+            visitor: { _ in }
         )
     }
 }
