@@ -158,4 +158,16 @@ final class VStackLayoutTests: XCTestCase {
             """
         )
     }
+    
+    func testMixedVStack() {
+        Utils.assertLeafLayout(
+            HStack(alignment: .bottom, spacing: 5) {
+                Rectangle().id(1).frame(height: 15)
+                    .frame(minWidth: 10, maxWidth: 30)
+            },
+            expectedLayout: """
+            1: 35.0 42.5 30.0 15.0
+            """
+        )
+    }
 }

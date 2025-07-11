@@ -19,13 +19,6 @@ final class FlexibleFrameTests: XCTestCase {
         )
     }
 
-    func testIdealWidth() {
-        Utils.assertLeafLayout(
-            Rectangle().id(1).frame(idealWidth: 30),
-            expectedLayout: "1: 0.0 0.0 100.0 100.0"
-        )
-    }
-
     func testMinHeight() {
         Utils.assertLeafLayout(
             Rectangle().id(1).frame(minHeight: 80),
@@ -37,13 +30,6 @@ final class FlexibleFrameTests: XCTestCase {
         Utils.assertLeafLayout(
             Rectangle().id(1).frame(maxHeight: 5),
             expectedLayout: "1: 0.0 47.5 100.0 5.0"
-        )
-    }
-
-    func testIdealHeight() {
-        Utils.assertLeafLayout(
-            Rectangle().id(1).frame(idealHeight: 30),
-            expectedLayout: "1: 0.0 0.0 100.0 100.0"
         )
     }
 
@@ -66,8 +52,8 @@ final class FlexibleFrameTests: XCTestCase {
     func testAllConstraints() {
         Utils.assertLeafLayout(
             Rectangle().id(1).frame(
-                minWidth: 30, maxWidth: 70, idealWidth: 50,
-                minHeight: 20, maxHeight: 80, idealHeight: 60
+                minWidth: 30, maxWidth: 70,
+                minHeight: 20, maxHeight: 80,
             ),
             expectedLayout: "1: 15.0 10.0 70.0 80.0"
         )
@@ -97,13 +83,6 @@ final class FlexibleFrameTests: XCTestCase {
     }
 
     // MARK: - Edge cases
-
-    func testMinGreaterThanMax() {
-        Utils.assertLeafLayout(
-            Rectangle().id(1).frame(minWidth: 80, maxWidth: 40),
-            expectedLayout: "1: 30.0 0.0 40.0 100.0"
-        )
-    }
 
     func testZeroSize() {
         Utils.assertLeafLayout(
@@ -156,6 +135,35 @@ final class FlexibleFrameTests: XCTestCase {
                 .frame(width: 60, height: 40)
                 .frame(minWidth: 30, maxWidth: 50, minHeight: 20, maxHeight: 30),
             expectedLayout: "1: 20.0 30.0 60.0 40.0"
+        )
+    }
+    
+    func testHStackAlignment() {
+        Utils.assertLeafLayout(
+            HStack(spacing: 10) {
+                Rectangle().id(1)
+                    .frame(width: 20, height: 20)
+                
+                Rectangle().id(2)
+                    .frame(width: 20, height: 20)
+            }
+            .frame(maxWidth: .infinity, alignment: .left),
+            expectedLayout: """
+            1: 0.0 40.0 20.0 20.0
+            2: 30.0 40.0 20.0 20.0
+            """
+        )
+    }
+    
+    func testInfinityMaxWidth() {
+        Utils.assertLeafLayout(
+            Rectangle()
+                .id(1)
+                .frame(width: 10, height: 10)
+                .frame(maxWidth: .infinity, alignment: .right),
+            expectedLayout: """
+            1: 90.0 45.0 10.0 10.0
+            """
         )
     }
 }

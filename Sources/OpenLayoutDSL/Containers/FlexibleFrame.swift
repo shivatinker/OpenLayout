@@ -16,20 +16,16 @@ extension LayoutItem {
     public func frame(
         minWidth: CGFloat? = nil,
         maxWidth: CGFloat? = nil,
-        idealWidth: CGFloat? = nil,
         minHeight: CGFloat? = nil,
         maxHeight: CGFloat? = nil,
-        idealHeight: CGFloat? = nil,
         alignment: Alignment = .center
     ) -> some LayoutItem {
         UnaryContainerItem(
             layout: FlexibleFrameLayout(
                 minWidth: minWidth,
                 maxWidth: maxWidth,
-                idealWidth: idealWidth,
                 minHeight: minHeight,
                 maxHeight: maxHeight,
-                idealHeight: idealHeight,
                 alignment: alignment
             ),
             child: self

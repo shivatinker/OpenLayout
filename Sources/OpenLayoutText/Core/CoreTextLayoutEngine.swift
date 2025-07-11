@@ -10,6 +10,15 @@ import CoreText
 import Foundation
 import OpenLayout
 
+extension ProposedSize {
+    func ceil() -> ProposedSize {
+        ProposedSize(
+            width: self.width.map(_math.ceil),
+            height: self.height.map(_math.ceil)
+        )
+    }
+}
+
 public struct CoreTextLayoutEngine: TextLayoutEngine {
     public init() {}
     
@@ -32,55 +41,29 @@ public struct CoreTextLayoutEngine: TextLayoutEngine {
             )
         )
         
-        // Create a path with the constraint size
-        let path = CGPath(rect: CGRect(origin: .zero, size: constraintSize), transform: nil)
+        var fitRange = CFRange()
+        let suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(
+            framesetter,
+            CFRangeMake(0, attributedString.length),
+            nil,
+            constraintSize,
+            &fitRange
+        )
         
-        // Create frame
-        let frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, nil)
-        
-        // Get the lines from the frame
-        let lines = CTFrameGetLines(frame) as! [CTLine]
-        
-        guard !lines.isEmpty else {
-            // Empty text case - return size based on font metrics
-            let font = attributes.font
-            let ascent = CTFontGetAscent(font)
-            let descent = CTFontGetDescent(font)
-            let leading = CTFontGetLeading(font)
-            let lineHeight = ascent + descent + leading
-            
-            return CGSize(
-                width: 0,
-                height: lineHeight
-            )
-        }
-        
-        // Calculate the total height
-        let lineCount = lines.count
         let font = attributes.font
         let ascent = CTFontGetAscent(font)
         let descent = CTFontGetDescent(font)
         let leading = CTFontGetLeading(font)
         let lineHeight = ascent + descent + leading
         
-        let totalHeight = CGFloat(lineCount) * lineHeight
-        
-        // Calculate the maximum width of all lines
-        var maxWidth: CGFloat = 0
-        for line in lines {
-            let lineWidth = CTLineGetTypographicBounds(line, nil, nil, nil)
-            maxWidth = max(maxWidth, lineWidth)
+        // If the text is empty, return font height
+        if text.isEmpty {
+            return CGSize(width: 0, height: lineHeight)
         }
         
-        // If we have a width constraint, respect it
-        if let proposedWidth = proposal.width {
-            maxWidth = min(maxWidth, proposedWidth)
-        }
-        
-        // If we have a height constraint, respect it
-        let finalHeight = proposal.height.map { min($0, totalHeight) } ?? totalHeight
-        
-        return CGSize(width: maxWidth, height: finalHeight)
+        let width = suggestedSize.width
+        let height = suggestedSize.height
+        return CGSize(width: width, height: height)
     }
     
     private func createAttributedString(

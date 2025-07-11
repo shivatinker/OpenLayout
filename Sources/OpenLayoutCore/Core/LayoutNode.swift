@@ -7,12 +7,23 @@
 
 import CoreGraphics
 
+extension NodeAttributes {
+    @TaskLocal
+    public static var current = NodeAttributes()
+}
+
+private final class LayoutNodeCache {
+    var sizeThatFits: [ProposedSize: CGSize] = [:]
+}
+
 public struct LayoutNode {
     private let layout: Layout
     private let children: [LayoutNode]
     
     public let leafItem: Any?
     private let attributes: NodeAttributes
+    
+    private let cache = LayoutNodeCache()
     
     private struct SizeProviderAdapter: LayoutSizeProvider {
         let node: LayoutNode
@@ -36,11 +47,19 @@ public struct LayoutNode {
         }
     }
     
-    private func sizeThatFits(_ size: ProposedSize) -> CGSize {
-        self.layout.sizeThatFits(
-            size,
-            children: self.children.map(SizeProviderAdapter.init(node:))
-        )
+    private func sizeThatFits(_ proposal: ProposedSize) -> CGSize {
+        if let cachedSize = self.cache.sizeThatFits[proposal] {
+            return cachedSize
+        }
+        else {
+            let size = self.layout.sizeThatFits(
+                proposal,
+                children: self.children.map(SizeProviderAdapter.init(node:))
+            )
+            
+            self.cache.sizeThatFits[proposal] = size
+            return size
+        }
     }
     
     func layout(
@@ -49,27 +68,29 @@ public struct LayoutNode {
         attributes: NodeAttributes,
         result: inout EvaluatedLayout
     ) {
-        let selfSize = self.sizeThatFits(proposition)
-        let selfRect = CGRect(anchorPoint: point, size: selfSize)
-        
-        result.add(node: self, attributes: attributes, rect: selfRect)
-        
-        var childrenElements = self.children.map {
-            ChildElement(node: $0, rect: nil)
-        }
-        
-        self.layout.placeChildren(in: selfRect, children: &childrenElements)
-        
         let childAttributes = attributes.merge(with: self.attributes)
         
-        for child in childrenElements {
-            if let rect = child.rect {
-                child.node.layout(
-                    at: AnchorPoint(point: rect.center, alignment: .center),
-                    proposition: ProposedSize(rect.size),
-                    attributes: childAttributes,
-                    result: &result
-                )
+        NodeAttributes.$current.withValue(childAttributes) {
+            let selfSize = self.sizeThatFits(proposition)
+            let selfRect = CGRect(anchorPoint: point, size: selfSize)
+            
+            result.add(node: self, attributes: attributes, rect: selfRect)
+            
+            var childrenElements = self.children.map {
+                ChildElement(node: $0, rect: nil)
+            }
+            
+            self.layout.placeChildren(in: selfRect, children: &childrenElements)
+            
+            for child in childrenElements {
+                if let rect = child.rect {
+                    child.node.layout(
+                        at: AnchorPoint(point: rect.center, alignment: .center),
+                        proposition: ProposedSize(rect.size),
+                        attributes: childAttributes,
+                        result: &result
+                    )
+                }
             }
         }
     }

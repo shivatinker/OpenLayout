@@ -6,13 +6,13 @@
 //
 
 public protocol NodeAttributeKey {
-    associatedtype Value
+    associatedtype Value: Sendable
     
     static var defaultValue: Value { get }
 }
 
-public struct NodeAttributes {
-    private var storage: [MetatypeWrapper: Any] = [:]
+public struct NodeAttributes: Sendable {
+    private var storage: [MetatypeWrapper: any Sendable] = [:]
     
     public init() {}
     
@@ -47,7 +47,7 @@ public struct NodeAttributes {
         return result
     }
     
-    private struct MetatypeWrapper: Hashable {
+    private struct MetatypeWrapper: Hashable, Sendable {
         let type: Any.Type
         
         init<Key: NodeAttributeKey>(_ type: Key.Type) {

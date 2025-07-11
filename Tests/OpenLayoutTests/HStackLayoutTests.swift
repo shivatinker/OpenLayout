@@ -158,4 +158,22 @@ final class HStackLayoutTests: XCTestCase {
             """
         )
     }
+    
+    func testMixedHStack() {
+        Utils.assertLeafLayout(
+            HStack(spacing: 10) {
+                Rectangle()
+                    .id(1)
+                    .frame(minWidth: 30, maxWidth: 100)
+                
+                Rectangle()
+                    .id(2)
+                    .frame(width: 10)
+            },
+            expectedLayout: """
+            1: 0.0 0.0 80.0 100.0
+            2: 90.0 0.0 10.0 100.0
+            """
+        )
+    }
 }

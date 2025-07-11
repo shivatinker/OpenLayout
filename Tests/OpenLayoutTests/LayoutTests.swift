@@ -64,15 +64,7 @@ enum Utils {
         
         if actualString != expectedString {
             // Generate visualization image
-            let image = LayoutVisualizer.visualize(root)
-            if let pngData = cgImageToPNGData(image) {
-                let attachment = XCTAttachment(data: pngData, uniformTypeIdentifier: "public.png")
-                attachment.name = "Layout Visualization"
-                attachment.lifetime = .keepAlways
-                XCTContext.runActivity(named: "Attach layout visualization") { activity in
-                    activity.add(attachment)
-                }
-            }
+            self.visualize(root)
             
             XCTFail("""
             Layout mismatch!
@@ -84,6 +76,19 @@ enum Utils {
         }
         else {
             XCTAssertEqual(actualString, expectedString, file: file, line: line)
+        }
+    }
+    
+    @MainActor
+    private static func visualize(_ root: some LayoutItem) {
+        let image = LayoutVisualizer.visualize(root)
+        if let pngData = cgImageToPNGData(image) {
+            let attachment = XCTAttachment(data: pngData, uniformTypeIdentifier: "public.png")
+            attachment.name = "Layout Visualization"
+            attachment.lifetime = .keepAlways
+            XCTContext.runActivity(named: "Attach layout visualization") { activity in
+                activity.add(attachment)
+            }
         }
     }
 

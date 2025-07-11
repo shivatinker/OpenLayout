@@ -31,6 +31,9 @@ enum LayoutVisualizer {
     ]
     
     static func visualize(_ layout: some LayoutItem) -> CGImage {
+        print("--- Visualizing layout ---")
+        defer { print("--- Layout visualization finished ---") }
+        
         let totalSize = CGSize(
             width: canvasSize.width + self.padding * 2,
             height: self.canvasSize.height + self.padding * 2
@@ -54,6 +57,10 @@ enum LayoutVisualizer {
         
         // Scale the context
         context.scaleBy(x: self.scale, y: self.scale)
+        
+        // Apply flipped coordinates transform
+        context.translateBy(x: 0, y: totalSize.height)
+        context.scaleBy(x: 1, y: -1)
         
         // Fill background with white
         context.setFillColor(CGColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0))
@@ -81,20 +88,6 @@ enum LayoutVisualizer {
         let items = result.items
         
         for item in items {
-            guard item.node.leafItem != nil else {
-                continue
-            }
-            
-            guard let id = item.attributes.value(for: IDNodeAttributeKey.self) else {
-                continue
-            }
-            
-            let colorIndex = (id - 1) % self.colors.count
-            let color = self.colors[colorIndex]
-            
-            context.setFillColor(color)
-            
-            // Adjust rect to account for padding
             let adjustedRect = CGRect(
                 x: item.rect.origin.x + self.padding,
                 y: item.rect.origin.y + self.padding,
@@ -102,30 +95,63 @@ enum LayoutVisualizer {
                 height: item.rect.size.height
             )
             
-            context.fill(adjustedRect)
-            
-            // Draw rectangle border
-            context.setStrokeColor(CGColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0))
-            context.setLineWidth(1.0)
-            context.stroke(adjustedRect)
-            
-            // Draw rectangle ID
-            let idString = "\(id)"
-            let font = CTFontCreateWithName("Helvetica" as CFString, 8, nil)
-            let attributes: [NSAttributedString.Key: Any] = [
-                .font: font,
-                .foregroundColor: CGColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0),
-            ]
-            let attributedString = NSAttributedString(string: idString, attributes: attributes)
-            let line = CTLineCreateWithAttributedString(attributedString)
-            let bounds = CTLineGetBoundsWithOptions(line, .useOpticalBounds)
-            // Center the text in the rectangle
-            let textX = adjustedRect.midX - bounds.width / 2 - bounds.origin.x
-            let textY = adjustedRect.midY - bounds.height / 2 - bounds.origin.y
-            context.textPosition = CGPoint(x: textX, y: textY)
-            CTLineDraw(line, context)
+            if item.node.leafItem != nil {
+                // This is a leaf element (rectangle), draw it with fill and border
+                self.drawLeafElement(context: context, rect: adjustedRect, item: item)
+            }
+            else {
+                // This is a non-leaf element (container), draw a thin blue border
+                self.drawContainerBorder(context: context, rect: adjustedRect)
+            }
         }
         
         return context.makeImage()!
+    }
+    
+    private static func drawLeafElement(context: CGContext, rect: CGRect, item: EvaluatedItem) {
+        guard let id = item.attributes.value(for: IDNodeAttributeKey.self) else {
+            return
+        }
+        
+        let colorIndex = (id - 1) % self.colors.count
+        let color = self.colors[colorIndex]
+        
+        context.setFillColor(color)
+        context.fill(rect)
+        
+        // Draw rectangle border
+        context.setStrokeColor(CGColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0))
+        context.setLineWidth(0.5)
+        context.stroke(rect)
+        
+        // Draw rectangle ID
+        let idString = "\(id)"
+        let font = CTFontCreateWithName("Helvetica" as CFString, 4, nil)
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .foregroundColor: CGColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0),
+        ]
+        let attributedString = NSAttributedString(string: idString, attributes: attributes)
+        let line = CTLineCreateWithAttributedString(attributedString)
+        let bounds = CTLineGetBoundsWithOptions(line, .useOpticalBounds)
+        // Center the text in the rectangle (accounting for flipped coordinates)
+        let textX = rect.midX - bounds.width / 2 - bounds.origin.x
+        let textY = rect.midY + bounds.height / 2 + bounds.origin.y
+        context.textPosition = CGPoint(x: textX, y: textY)
+        CTLineDraw(line, context)
+    }
+    
+    private static func drawContainerBorder(context: CGContext, rect: CGRect) {
+        // Draw border exactly on the real border (not centered)
+        let borderRect = CGRect(
+            x: rect.minX - 0.5, // Adjust for 0.5px line width to be exactly on border
+            y: rect.minY - 0.5,
+            width: rect.width + 1.0,
+            height: rect.height + 1.0
+        )
+        
+        context.setStrokeColor(CGColor(red: 0.0, green: 0.0, blue: 1.0, alpha: 1.0))
+        context.setLineWidth(0.5)
+        context.stroke(borderRect)
     }
 }

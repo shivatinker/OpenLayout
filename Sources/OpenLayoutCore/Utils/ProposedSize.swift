@@ -7,7 +7,7 @@
 
 import CoreGraphics
 
-public struct ProposedSize: Sendable {
+public struct ProposedSize: Sendable, CustomStringConvertible, Hashable {
     public var width: CGFloat?
     public var height: CGFloat?
     
@@ -30,5 +30,17 @@ public struct ProposedSize: Sendable {
     public init(_ size: CGSize) {
         self.width = size.width
         self.height = size.height
+    }
+    
+    public var description: String {
+        "\(self.description(for: self.width)) x \(self.description(for: self.height))"
+    }
+    
+    private func description(for dimension: CGFloat?) -> String {
+        guard let dimension else {
+            return "nil"
+        }
+        
+        return dimension.description
     }
 }

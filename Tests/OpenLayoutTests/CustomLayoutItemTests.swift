@@ -38,8 +38,8 @@ private struct ProfileCard: LayoutItem {
                 Rectangle().id(6).frame(width: 15, height: 3)
             }
         }
-        .padding(2)
         .frame(minWidth: 30, maxWidth: 50)
+        .padding(2)
     }
 }
 
@@ -52,7 +52,7 @@ private struct Dashboard: LayoutItem {
                 Rectangle().id(7).frame(width: 60, height: 10)
             }
             
-            HStack(alignment: .top, spacing: 6) {
+            HStack(alignment: .bottom, spacing: 6) {
                 Card(title: "Stats", backgroundColor: "blue")
                 ProfileCard(name: "John", avatarSize: 12)
             }
@@ -142,14 +142,14 @@ final class CustomLayoutItemTests: XCTestCase {
         Utils.assertLeafLayout(
             Dashboard(showHeader: true),
             expectedLayout: """
-            1: 12.0 40.0 30.0 8.0
-            2: 14.5 50.0 25.0 6.0
-            3: 17.0 58.0 20.0 4.0
-            4: 53.0 39.0 12.0 12.0
-            5: 69.0 40.0 20.0 5.0
-            6: 69.0 47.0 15.0 3.0
-            7: 20.0 23.0 60.0 10.0
-            8: 25.0 69.0 50.0 8.0
+            1: 9.0 40.0 30.0 8.0
+            2: 11.5 50.0 25.0 6.0
+            3: 14.0 58.0 20.0 4.0
+            4: 55.0 52.0 12.0 12.0
+            5: 71.0 53.0 20.0 5.0
+            6: 71.0 60.0 15.0 3.0
+            7: 20.0 22.0 60.0 10.0
+            8: 25.0 70.0 50.0 8.0
             """
         )
     }
@@ -177,16 +177,16 @@ final class CustomLayoutItemTests: XCTestCase {
                 ResponsiveGrid(columns: 2, spacing: 2)
             },
             expectedLayout: """
-            1: 56.0 41.0 30.0 8.0
-            2: 58.5 51.0 25.0 6.0
-            3: 61.0 59.0 20.0 4.0
-            4: 13.0 47.0 10.0 10.0
-            5: 27.0 47.0 20.0 5.0
-            6: 27.0 54.0 15.0 3.0
-            9: 41.0 75.0 8.0 8.0
-            10: 51.0 75.0 8.0 8.0
-            11: 41.0 85.0 8.0 8.0
-            12: 51.0 85.0 8.0 8.0
+            1: 64.0 42.0 30.0 8.0
+            2: 66.5 52.0 25.0 6.0
+            3: 69.0 60.0 20.0 4.0
+            4: 11.0 48.0 10.0 10.0
+            5: 25.0 48.0 20.0 5.0
+            6: 25.0 55.0 15.0 3.0
+            9: 41.0 77.0 8.0 8.0
+            10: 51.0 77.0 8.0 8.0
+            11: 41.0 87.0 8.0 8.0
+            12: 51.0 87.0 8.0 8.0
             """
         )
     }
