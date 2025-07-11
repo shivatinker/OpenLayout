@@ -13,8 +13,8 @@ final class HStackLayoutTests: XCTestCase {
     func testBasicHStack() {
         Utils.assertLeafLayout(
             HStack {
-                Rectangle(1)
-                Rectangle(2)
+                Rectangle().id(1)
+                Rectangle().id(2)
             },
             expectedLayout: """
             1: 0.0 0.0 46.0 100.0
@@ -26,9 +26,9 @@ final class HStackLayoutTests: XCTestCase {
     func testHStackWithSpacing() {
         Utils.assertLeafLayout(
             HStack(spacing: 20) {
-                Rectangle(1)
-                Rectangle(2)
-                Rectangle(3)
+                Rectangle().id(1)
+                Rectangle().id(2)
+                Rectangle().id(3)
             },
             expectedLayout: """
             1: 0.0 0.0 20.0 100.0
@@ -41,8 +41,8 @@ final class HStackLayoutTests: XCTestCase {
     func testHStackWithFixedSizeChildren() {
         Utils.assertLeafLayout(
             HStack {
-                Rectangle(1).frame(width: 30, height: 20)
-                Rectangle(2).frame(width: 40, height: 30)
+                Rectangle().id(1).frame(width: 30, height: 20)
+                Rectangle().id(2).frame(width: 40, height: 30)
             },
             expectedLayout: """
             1: 11.0 40.0 30.0 20.0
@@ -54,8 +54,8 @@ final class HStackLayoutTests: XCTestCase {
     func testHStackWithFlexibleFrame() {
         Utils.assertLeafLayout(
             HStack {
-                Rectangle(1).frame(minWidth: 20, maxWidth: 40)
-                Rectangle(2).frame(minWidth: 30, maxWidth: 50)
+                Rectangle().id(1).frame(minWidth: 20, maxWidth: 40)
+                Rectangle().id(2).frame(minWidth: 30, maxWidth: 50)
             },
             expectedLayout: """
             1: 1.0 0.0 40.0 100.0
@@ -67,8 +67,8 @@ final class HStackLayoutTests: XCTestCase {
     func testHStackWithPadding() {
         Utils.assertLeafLayout(
             HStack {
-                Rectangle(1).padding(10)
-                Rectangle(2).padding(5)
+                Rectangle().id(1).padding(10)
+                Rectangle().id(2).padding(5)
             },
             expectedLayout: """
             1: 10.0 10.0 26.0 80.0
@@ -80,7 +80,7 @@ final class HStackLayoutTests: XCTestCase {
     func testSingleChildHStack() {
         Utils.assertLeafLayout(
             HStack {
-                Rectangle(1)
+                Rectangle().id(1)
             },
             expectedLayout: "1: 0.0 0.0 100.0 100.0"
         )
@@ -98,9 +98,9 @@ final class HStackLayoutTests: XCTestCase {
     func testHStackWithTopAlignment() {
         Utils.assertLeafLayout(
             HStack(alignment: .top, spacing: 8) {
-                Rectangle(1).frame(width: 20, height: 30)
-                Rectangle(2).frame(width: 30, height: 20)
-                Rectangle(3).frame(width: 25, height: 40)
+                Rectangle().id(1).frame(width: 20, height: 30)
+                Rectangle().id(2).frame(width: 30, height: 20)
+                Rectangle().id(3).frame(width: 25, height: 40)
             }
             .frame(width: 100, height: 100),
             expectedLayout: """
@@ -114,9 +114,9 @@ final class HStackLayoutTests: XCTestCase {
     func testHStackWithCenterAlignment() {
         Utils.assertLeafLayout(
             HStack(alignment: .center, spacing: 8) {
-                Rectangle(1).frame(width: 20, height: 30)
-                Rectangle(2).frame(width: 30, height: 20)
-                Rectangle(3).frame(width: 25, height: 40)
+                Rectangle().id(1).frame(width: 20, height: 30)
+                Rectangle().id(2).frame(width: 30, height: 20)
+                Rectangle().id(3).frame(width: 25, height: 40)
             }
             .frame(width: 100, height: 100),
             expectedLayout: """
@@ -130,9 +130,9 @@ final class HStackLayoutTests: XCTestCase {
     func testHStackWithBottomAlignment() {
         Utils.assertLeafLayout(
             HStack(alignment: .bottom, spacing: 8) {
-                Rectangle(1).frame(width: 20, height: 30)
-                Rectangle(2).frame(width: 30, height: 20)
-                Rectangle(3).frame(width: 25, height: 40)
+                Rectangle().id(1).frame(width: 20, height: 30)
+                Rectangle().id(2).frame(width: 30, height: 20)
+                Rectangle().id(3).frame(width: 25, height: 40)
             }
             .frame(width: 100, height: 100),
             expectedLayout: """
@@ -146,9 +146,9 @@ final class HStackLayoutTests: XCTestCase {
     func testHStackWithAlignmentAndSpacing() {
         Utils.assertLeafLayout(
             HStack(alignment: .center, spacing: 10) {
-                Rectangle(1).frame(width: 15, height: 25)
-                Rectangle(2).frame(width: 20, height: 15)
-                Rectangle(3).frame(width: 18, height: 35)
+                Rectangle().id(1).frame(width: 15, height: 25)
+                Rectangle().id(2).frame(width: 20, height: 15)
+                Rectangle().id(3).frame(width: 18, height: 35)
             }
             .frame(width: 100, height: 100),
             expectedLayout: """

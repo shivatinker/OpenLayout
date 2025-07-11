@@ -35,3 +35,27 @@ extension LayoutItem {
         self.body.makeNode()
     }
 }
+
+extension LayoutItem {
+    public func attribute<Key: NodeAttributeKey>(
+        _ key: Key.Type,
+        _ value: Key.Value
+    ) -> some LayoutItem {
+        AttributeItem(
+            attributes: NodeAttributes(key: key, value: value),
+            content: self
+        )
+    }
+}
+
+private struct AttributeItem<Content: LayoutItem>: LayoutItem {
+    let attributes: NodeAttributes
+    let content: Content
+    
+    public func makeNode() -> LayoutNode {
+        LayoutNode.makeAttributeNode(
+            attributes: self.attributes,
+            child: self.content.makeNode()
+        )
+    }
+}

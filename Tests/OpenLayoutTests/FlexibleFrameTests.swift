@@ -7,42 +7,42 @@ final class FlexibleFrameTests: XCTestCase {
 
     func testMinWidth() {
         Utils.assertLeafLayout(
-            Rectangle(1).frame(minWidth: 80),
+            Rectangle().id(1).frame(minWidth: 80),
             expectedLayout: "1: 0.0 0.0 100.0 100.0"
         )
     }
 
     func testMaxWidth() {
         Utils.assertLeafLayout(
-            Rectangle(1).frame(maxWidth: 5),
+            Rectangle().id(1).frame(maxWidth: 5),
             expectedLayout: "1: 47.5 0.0 5.0 100.0"
         )
     }
 
     func testIdealWidth() {
         Utils.assertLeafLayout(
-            Rectangle(1).frame(idealWidth: 30),
+            Rectangle().id(1).frame(idealWidth: 30),
             expectedLayout: "1: 0.0 0.0 100.0 100.0"
         )
     }
 
     func testMinHeight() {
         Utils.assertLeafLayout(
-            Rectangle(1).frame(minHeight: 80),
+            Rectangle().id(1).frame(minHeight: 80),
             expectedLayout: "1: 0.0 0.0 100.0 100.0"
         )
     }
 
     func testMaxHeight() {
         Utils.assertLeafLayout(
-            Rectangle(1).frame(maxHeight: 5),
+            Rectangle().id(1).frame(maxHeight: 5),
             expectedLayout: "1: 0.0 47.5 100.0 5.0"
         )
     }
 
     func testIdealHeight() {
         Utils.assertLeafLayout(
-            Rectangle(1).frame(idealHeight: 30),
+            Rectangle().id(1).frame(idealHeight: 30),
             expectedLayout: "1: 0.0 0.0 100.0 100.0"
         )
     }
@@ -51,21 +51,21 @@ final class FlexibleFrameTests: XCTestCase {
 
     func testMinMaxWidth() {
         Utils.assertLeafLayout(
-            Rectangle(1).frame(minWidth: 40, maxWidth: 60),
+            Rectangle().id(1).frame(minWidth: 40, maxWidth: 60),
             expectedLayout: "1: 20.0 0.0 60.0 100.0"
         )
     }
 
     func testMinMaxHeight() {
         Utils.assertLeafLayout(
-            Rectangle(1).frame(minHeight: 40, maxHeight: 60),
+            Rectangle().id(1).frame(minHeight: 40, maxHeight: 60),
             expectedLayout: "1: 0.0 20.0 100.0 60.0"
         )
     }
 
     func testAllConstraints() {
         Utils.assertLeafLayout(
-            Rectangle(1).frame(
+            Rectangle().id(1).frame(
                 minWidth: 30, maxWidth: 70, idealWidth: 50,
                 minHeight: 20, maxHeight: 80, idealHeight: 60
             ),
@@ -77,7 +77,7 @@ final class FlexibleFrameTests: XCTestCase {
 
     private func assertAlignment(_ alignment: Alignment, _ expected: String) {
         Utils.assertLeafLayout(
-            Rectangle(1)
+            Rectangle().id(1)
                 .frame(maxWidth: 60, maxHeight: 40)
                 .frame(minWidth: 100, minHeight: 100, alignment: alignment),
             expectedLayout: expected
@@ -100,14 +100,14 @@ final class FlexibleFrameTests: XCTestCase {
 
     func testMinGreaterThanMax() {
         Utils.assertLeafLayout(
-            Rectangle(1).frame(minWidth: 80, maxWidth: 40),
+            Rectangle().id(1).frame(minWidth: 80, maxWidth: 40),
             expectedLayout: "1: 30.0 0.0 40.0 100.0"
         )
     }
 
     func testZeroSize() {
         Utils.assertLeafLayout(
-            Rectangle(1).frame(minWidth: 0, maxWidth: 0, minHeight: 0, maxHeight: 0),
+            Rectangle().id(1).frame(minWidth: 0, maxWidth: 0, minHeight: 0, maxHeight: 0),
             expectedLayout: "1: 50.0 50.0 0.0 0.0"
         )
     }
@@ -116,7 +116,7 @@ final class FlexibleFrameTests: XCTestCase {
 
     func testFlexibleFrameClampsFixedChildMinWidth() {
         Utils.assertLeafLayout(
-            Rectangle(1)
+            Rectangle().id(1)
                 .frame(width: 60, height: 40)
                 .frame(minWidth: 80),
             expectedLayout: "1: 20.0 30.0 60.0 40.0"
@@ -125,7 +125,7 @@ final class FlexibleFrameTests: XCTestCase {
 
     func testFlexibleFrameClampsFixedChildMaxWidth() {
         Utils.assertLeafLayout(
-            Rectangle(1)
+            Rectangle().id(1)
                 .frame(width: 60, height: 40)
                 .frame(maxWidth: 50),
             expectedLayout: "1: 20.0 30.0 60.0 40.0"
@@ -134,7 +134,7 @@ final class FlexibleFrameTests: XCTestCase {
 
     func testFlexibleFrameClampsFixedChildMinHeight() {
         Utils.assertLeafLayout(
-            Rectangle(1)
+            Rectangle().id(1)
                 .frame(width: 60, height: 40)
                 .frame(minHeight: 80),
             expectedLayout: "1: 20.0 30.0 60.0 40.0"
@@ -143,7 +143,7 @@ final class FlexibleFrameTests: XCTestCase {
 
     func testFlexibleFrameClampsFixedChildMaxHeight() {
         Utils.assertLeafLayout(
-            Rectangle(1)
+            Rectangle().id(1)
                 .frame(width: 60, height: 40)
                 .frame(maxHeight: 30),
             expectedLayout: "1: 20.0 30.0 60.0 40.0"
@@ -152,7 +152,7 @@ final class FlexibleFrameTests: XCTestCase {
 
     func testFlexibleFrameClampsFixedChildAll() {
         Utils.assertLeafLayout(
-            Rectangle(1)
+            Rectangle().id(1)
                 .frame(width: 60, height: 40)
                 .frame(minWidth: 30, maxWidth: 50, minHeight: 20, maxHeight: 30),
             expectedLayout: "1: 20.0 30.0 60.0 40.0"

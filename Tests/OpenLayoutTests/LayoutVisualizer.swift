@@ -78,21 +78,28 @@ enum LayoutVisualizer {
         )
         
         // Draw rectangles
-        let leafs = result.collectLeafs()
-        for leaf in leafs {
-            guard let rectangle = leaf.item as? Rectangle else { continue }
+        let items = result.items
+        
+        for item in items {
+            guard item.node.leafItem != nil else {
+                continue
+            }
             
-            let colorIndex = (rectangle.id - 1) % self.colors.count
+            guard let id = item.attributes.value(for: IDNodeAttributeKey.self) else {
+                continue
+            }
+            
+            let colorIndex = (id - 1) % self.colors.count
             let color = self.colors[colorIndex]
             
             context.setFillColor(color)
             
             // Adjust rect to account for padding
             let adjustedRect = CGRect(
-                x: leaf.rect.origin.x + self.padding,
-                y: leaf.rect.origin.y + self.padding,
-                width: leaf.rect.size.width,
-                height: leaf.rect.size.height
+                x: item.rect.origin.x + self.padding,
+                y: item.rect.origin.y + self.padding,
+                width: item.rect.size.width,
+                height: item.rect.size.height
             )
             
             context.fill(adjustedRect)
@@ -103,7 +110,7 @@ enum LayoutVisualizer {
             context.stroke(adjustedRect)
             
             // Draw rectangle ID
-            let idString = "\(rectangle.id)"
+            let idString = "\(id)"
             let font = CTFontCreateWithName("Helvetica" as CFString, 8, nil)
             let attributes: [NSAttributedString.Key: Any] = [
                 .font: font,

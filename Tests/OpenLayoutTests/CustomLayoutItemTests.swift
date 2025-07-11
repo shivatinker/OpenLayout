@@ -16,9 +16,9 @@ private struct Card: LayoutItem {
     
     var body: some LayoutItem {
         VStack(alignment: .center, spacing: 2) {
-            Rectangle(1).frame(width: 30, height: 8)
-            Rectangle(2).frame(width: 25, height: 6)
-            Rectangle(3).frame(width: 20, height: 4)
+            Rectangle().id(1).frame(width: 30, height: 8)
+            Rectangle().id(2).frame(width: 25, height: 6)
+            Rectangle().id(3).frame(width: 20, height: 4)
         }
         .padding(3)
         .frame(minWidth: 36, maxWidth: 40, minHeight: 25, maxHeight: 30)
@@ -31,11 +31,11 @@ private struct ProfileCard: LayoutItem {
     
     var body: some LayoutItem {
         HStack(alignment: .center, spacing: 4) {
-            Rectangle(4).frame(width: self.avatarSize, height: self.avatarSize)
+            Rectangle().id(4).frame(width: self.avatarSize, height: self.avatarSize)
             
             VStack(alignment: .left, spacing: 2) {
-                Rectangle(5).frame(width: 20, height: 5)
-                Rectangle(6).frame(width: 15, height: 3)
+                Rectangle().id(5).frame(width: 20, height: 5)
+                Rectangle().id(6).frame(width: 15, height: 3)
             }
         }
         .padding(2)
@@ -49,7 +49,7 @@ private struct Dashboard: LayoutItem {
     var body: some LayoutItem {
         VStack(alignment: .center, spacing: 4) {
             if self.showHeader {
-                Rectangle(7).frame(width: 60, height: 10)
+                Rectangle().id(7).frame(width: 60, height: 10)
             }
             
             HStack(alignment: .top, spacing: 6) {
@@ -57,7 +57,7 @@ private struct Dashboard: LayoutItem {
                 ProfileCard(name: "John", avatarSize: 12)
             }
             
-            Rectangle(8).frame(width: 50, height: 8)
+            Rectangle().id(8).frame(width: 50, height: 8)
         }
         .padding(4)
     }
@@ -72,7 +72,8 @@ private struct ResponsiveGrid: LayoutItem {
             for row in 0..<self.columns {
                 HStack(alignment: .center, spacing: self.spacing) {
                     for col in 0..<self.columns {
-                        Rectangle(row * self.columns + col + 9)
+                        Rectangle()
+                            .id(row * self.columns + col + 9)
                             .frame(width: 8, height: 8)
                     }
                 }
@@ -87,9 +88,9 @@ private struct AlignedCard: LayoutItem {
     
     var body: some LayoutItem {
         VStack(alignment: .center, spacing: 2) {
-            Rectangle(1).frame(width: 30, height: 8)
-            Rectangle(2).frame(width: 25, height: 6)
-            Rectangle(3).frame(width: 20, height: 4)
+            Rectangle().id(1).frame(width: 30, height: 8)
+            Rectangle().id(2).frame(width: 25, height: 6)
+            Rectangle().id(3).frame(width: 20, height: 4)
         }
         .frame(width: 40, height: 30, alignment: self.alignment)
     }
@@ -100,11 +101,11 @@ private struct AlignedProfile: LayoutItem {
     
     var body: some LayoutItem {
         HStack(alignment: .center, spacing: 4) {
-            Rectangle(4).frame(width: 15, height: 15)
+            Rectangle().id(4).frame(width: 15, height: 15)
             
             VStack(alignment: .left, spacing: 2) {
-                Rectangle(5).frame(width: 20, height: 5)
-                Rectangle(6).frame(width: 15, height: 3)
+                Rectangle().id(5).frame(width: 20, height: 5)
+                Rectangle().id(6).frame(width: 15, height: 3)
             }
         }
         .frame(width: 45, height: 25, alignment: self.alignment)
@@ -196,9 +197,9 @@ final class CustomLayoutItemTests: XCTestCase {
         // Test VStack with different alignments
         Utils.assertLeafLayout(
             VStack(alignment: .left, spacing: 4) {
-                Rectangle(1).frame(width: 20, height: 10)
-                Rectangle(2).frame(width: 30, height: 8)
-                Rectangle(3).frame(width: 15, height: 12)
+                Rectangle().id(1).frame(width: 20, height: 10)
+                Rectangle().id(2).frame(width: 30, height: 8)
+                Rectangle().id(3).frame(width: 15, height: 12)
             }
             .frame(width: 50, height: 40),
             expectedLayout: """
@@ -210,9 +211,9 @@ final class CustomLayoutItemTests: XCTestCase {
         
         Utils.assertLeafLayout(
             VStack(alignment: .center, spacing: 4) {
-                Rectangle(1).frame(width: 20, height: 10)
-                Rectangle(2).frame(width: 30, height: 8)
-                Rectangle(3).frame(width: 15, height: 12)
+                Rectangle().id(1).frame(width: 20, height: 10)
+                Rectangle().id(2).frame(width: 30, height: 8)
+                Rectangle().id(3).frame(width: 15, height: 12)
             }
             .frame(width: 50, height: 40),
             expectedLayout: """
@@ -224,9 +225,9 @@ final class CustomLayoutItemTests: XCTestCase {
         
         Utils.assertLeafLayout(
             VStack(alignment: .right, spacing: 4) {
-                Rectangle(1).frame(width: 20, height: 10)
-                Rectangle(2).frame(width: 30, height: 8)
-                Rectangle(3).frame(width: 15, height: 12)
+                Rectangle().id(1).frame(width: 20, height: 10)
+                Rectangle().id(2).frame(width: 30, height: 8)
+                Rectangle().id(3).frame(width: 15, height: 12)
             }
             .frame(width: 50, height: 40),
             expectedLayout: """
@@ -241,9 +242,9 @@ final class CustomLayoutItemTests: XCTestCase {
         // Test HStack with different alignments
         Utils.assertLeafLayout(
             HStack(alignment: .top, spacing: 4) {
-                Rectangle(1).frame(width: 15, height: 20)
-                Rectangle(2).frame(width: 20, height: 15)
-                Rectangle(3).frame(width: 10, height: 25)
+                Rectangle().id(1).frame(width: 15, height: 20)
+                Rectangle().id(2).frame(width: 20, height: 15)
+                Rectangle().id(3).frame(width: 10, height: 25)
             }
             .frame(width: 50, height: 30),
             expectedLayout: """
@@ -255,9 +256,9 @@ final class CustomLayoutItemTests: XCTestCase {
         
         Utils.assertLeafLayout(
             HStack(alignment: .center, spacing: 4) {
-                Rectangle(1).frame(width: 15, height: 20)
-                Rectangle(2).frame(width: 20, height: 15)
-                Rectangle(3).frame(width: 10, height: 25)
+                Rectangle().id(1).frame(width: 15, height: 20)
+                Rectangle().id(2).frame(width: 20, height: 15)
+                Rectangle().id(3).frame(width: 10, height: 25)
             }
             .frame(width: 50, height: 30),
             expectedLayout: """
@@ -269,9 +270,9 @@ final class CustomLayoutItemTests: XCTestCase {
         
         Utils.assertLeafLayout(
             HStack(alignment: .bottom, spacing: 4) {
-                Rectangle(1).frame(width: 15, height: 20)
-                Rectangle(2).frame(width: 20, height: 15)
-                Rectangle(3).frame(width: 10, height: 25)
+                Rectangle().id(1).frame(width: 15, height: 20)
+                Rectangle().id(2).frame(width: 20, height: 15)
+                Rectangle().id(3).frame(width: 10, height: 25)
             }
             .frame(width: 50, height: 30),
             expectedLayout: """
@@ -347,18 +348,18 @@ final class CustomLayoutItemTests: XCTestCase {
         Utils.assertLeafLayout(
             VStack(alignment: .left, spacing: 6) {
                 HStack(alignment: .top, spacing: 4) {
-                    Rectangle(1).frame(width: 12, height: 15)
-                    Rectangle(2).frame(width: 18, height: 10)
+                    Rectangle().id(1).frame(width: 12, height: 15)
+                    Rectangle().id(2).frame(width: 18, height: 10)
                 }
                 
                 HStack(alignment: .center, spacing: 4) {
-                    Rectangle(3).frame(width: 15, height: 12)
-                    Rectangle(4).frame(width: 20, height: 8)
+                    Rectangle().id(3).frame(width: 15, height: 12)
+                    Rectangle().id(4).frame(width: 20, height: 8)
                 }
                 
                 HStack(alignment: .bottom, spacing: 4) {
-                    Rectangle(5).frame(width: 10, height: 18)
-                    Rectangle(6).frame(width: 16, height: 14)
+                    Rectangle().id(5).frame(width: 10, height: 18)
+                    Rectangle().id(6).frame(width: 16, height: 14)
                 }
             }
             .frame(width: 40, height: 50),

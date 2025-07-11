@@ -14,7 +14,7 @@ final class FixedFrameTests: XCTestCase {
     
     func testFixedWidthOnly() {
         Utils.assertLeafLayout(
-            Rectangle(1).frame(width: 50),
+            Rectangle().id(1).frame(width: 50),
             expectedLayout: """
             1: 25.0 0.0 50.0 100.0
             """
@@ -25,7 +25,7 @@ final class FixedFrameTests: XCTestCase {
     
     func testFixedHeightOnly() {
         Utils.assertLeafLayout(
-            Rectangle(1).frame(height: 30),
+            Rectangle().id(1).frame(height: 30),
             expectedLayout: """
             1: 0.0 35.0 100.0 30.0
             """
@@ -36,7 +36,7 @@ final class FixedFrameTests: XCTestCase {
     
     func testFixedWidthAndHeight() {
         Utils.assertLeafLayout(
-            Rectangle(1).frame(width: 60, height: 40),
+            Rectangle().id(1).frame(width: 60, height: 40),
             expectedLayout: """
             1: 20.0 30.0 60.0 40.0
             """
@@ -52,7 +52,7 @@ final class FixedFrameTests: XCTestCase {
         line: UInt = #line
     ) {
         Utils.assertLeafLayout(
-            Rectangle(1)
+            Rectangle().id(1)
                 .frame(width: 50)
                 .frame(width: 100, height: 100, alignment: alignment),
             expectedLayout: expected,
@@ -68,7 +68,7 @@ final class FixedFrameTests: XCTestCase {
         line: UInt = #line
     ) {
         Utils.assertLeafLayout(
-            Rectangle(1)
+            Rectangle().id(1)
                 .frame(height: 30)
                 .frame(width: 100, height: 100, alignment: alignment),
             expectedLayout: expected,
@@ -98,7 +98,7 @@ final class FixedFrameTests: XCTestCase {
         line: UInt = #line
     ) {
         Utils.assertLeafLayout(
-            Rectangle(1)
+            Rectangle().id(1)
                 .frame(width: 60, height: 40)
                 .frame(width: 100, height: 100, alignment: alignment),
             expectedLayout: expected,
@@ -123,7 +123,7 @@ final class FixedFrameTests: XCTestCase {
     
     func testFixedWidthAndHeightLargerThanContainer() {
         Utils.assertLeafLayout(
-            Rectangle(1).frame(width: 150, height: 120),
+            Rectangle().id(1).frame(width: 150, height: 120),
             expectedLayout: """
             1: -25.0 -10.0 150.0 120.0
             """
@@ -132,7 +132,7 @@ final class FixedFrameTests: XCTestCase {
     
     func testFixedWidthAndHeightWithZeroDimensions() {
         Utils.assertLeafLayout(
-            Rectangle(1).frame(width: 0, height: 0),
+            Rectangle().id(1).frame(width: 0, height: 0),
             expectedLayout: """
             1: 50.0 50.0 0.0 0.0
             """
@@ -143,7 +143,7 @@ final class FixedFrameTests: XCTestCase {
     
     func testNestedFixedFrames() {
         Utils.assertLeafLayout(
-            Rectangle(1)
+            Rectangle().id(1)
                 .frame(width: 80, height: 60)
                 .frame(width: 50, height: 40),
             expectedLayout: """
@@ -154,7 +154,7 @@ final class FixedFrameTests: XCTestCase {
     
     func testNestedFixedFramesWithAlignment() {
         Utils.assertLeafLayout(
-            Rectangle(1)
+            Rectangle().id(1)
                 .frame(width: 60, height: 40)
                 .frame(width: 100, height: 100, alignment: .topLeft)
                 .frame(width: 200, height: 200, alignment: .bottomRight),

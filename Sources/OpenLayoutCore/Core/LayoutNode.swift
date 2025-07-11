@@ -11,7 +11,8 @@ public struct LayoutNode {
     private let layout: Layout
     private let children: [LayoutNode]
     
-    let leafItem: Any?
+    public let leafItem: Any?
+    private let attributes: NodeAttributes
     
     private struct SizeProviderAdapter: LayoutSizeProvider {
         let node: LayoutNode
@@ -45,12 +46,13 @@ public struct LayoutNode {
     func layout(
         at point: AnchorPoint,
         proposition: ProposedSize,
+        attributes: NodeAttributes,
         result: inout EvaluatedLayout
     ) {
         let selfSize = self.sizeThatFits(proposition)
         let selfRect = CGRect(anchorPoint: point, size: selfSize)
         
-        result.add(node: self, rect: selfRect)
+        result.add(node: self, attributes: attributes, rect: selfRect)
         
         var childrenElements = self.children.map {
             ChildElement(node: $0, rect: nil)
@@ -58,11 +60,14 @@ public struct LayoutNode {
         
         self.layout.placeChildren(in: selfRect, children: &childrenElements)
         
+        let childAttributes = attributes.merge(with: self.attributes)
+        
         for child in childrenElements {
             if let rect = child.rect {
                 child.node.layout(
                     at: AnchorPoint(point: rect.center, alignment: .center),
                     proposition: ProposedSize(rect.size),
+                    attributes: childAttributes,
                     result: &result
                 )
             }
@@ -73,12 +78,14 @@ public struct LayoutNode {
     
     private init(
         layout: Layout,
+        children: [LayoutNode] = [],
         leafItem: Any? = nil,
-        children: [LayoutNode] = []
+        attributes: NodeAttributes = NodeAttributes()
     ) {
         self.layout = layout
-        self.leafItem = leafItem
         self.children = children
+        self.leafItem = leafItem
+        self.attributes = attributes
     }
     
     public static func makeLeaf(
@@ -108,6 +115,17 @@ public struct LayoutNode {
         self.init(
             layout: layout.makeAdapter(),
             children: [child]
+        )
+    }
+    
+    public static func makeAttributeNode(
+        attributes: NodeAttributes,
+        child: LayoutNode
+    ) -> Self {
+        self.init(
+            layout: TransparentLayout().makeAdapter(),
+            children: [child],
+            attributes: attributes
         )
     }
 }

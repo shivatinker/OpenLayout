@@ -20,39 +20,32 @@ public struct LayoutEngine {
         
         let anchorPoint = AnchorPoint(point: rect.center, alignment: .center)
         
-        root.layout(at: anchorPoint, proposition: proposedSize, result: &result)
+        root.layout(
+            at: anchorPoint,
+            proposition: proposedSize,
+            attributes: NodeAttributes(),
+            result: &result
+        )
         
         return result
     }
 }
 
-struct EvaluatedItem {
-    let node: LayoutNode
-    let rect: CGRect
-}
-
-public struct EvaluatedLeaf {
-    public let item: Any
+public struct EvaluatedItem {
+    public let node: LayoutNode
+    
+    // FIXME: Memory consumption
+    public let attributes: NodeAttributes
+    
     public let rect: CGRect
 }
 
 public struct EvaluatedLayout {
-    private var result: [EvaluatedItem] = []
+    public private(set) var items: [EvaluatedItem] = []
     
     init() {}
     
-    mutating func add(node: LayoutNode, rect: CGRect) {
-        self.result.append(EvaluatedItem(node: node, rect: rect))
-    }
-    
-    public func collectLeafs() -> [EvaluatedLeaf] {
-        self.result.compactMap { item in
-            if let leafItem = item.node.leafItem {
-                return EvaluatedLeaf(item: leafItem, rect: item.rect)
-            }
-            else {
-                return nil
-            }
-        }
+    mutating func add(node: LayoutNode, attributes: NodeAttributes, rect: CGRect) {
+        self.items.append(EvaluatedItem(node: node, attributes: attributes, rect: rect))
     }
 }

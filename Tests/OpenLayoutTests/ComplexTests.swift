@@ -13,8 +13,8 @@ final class ComplexTests: XCTestCase {
     func testSimpleMinWidthConstraint() {
         Utils.assertLeafLayout(
             HStack(spacing: 10) {
-                Rectangle(1).frame(minWidth: 60, maxWidth: 80)
-                Rectangle(2).frame(width: 20, height: 20)
+                Rectangle().id(1).frame(minWidth: 60, maxWidth: 80)
+                Rectangle().id(2).frame(width: 20, height: 20)
             },
             expectedLayout: """
             1: 0.0 0.0 70.0 100.0
@@ -27,16 +27,16 @@ final class ComplexTests: XCTestCase {
         Utils.assertLeafLayout(
             HStack(spacing: 10) {
                 VStack(spacing: 5) {
-                    Rectangle(1).frame(width: 10, height: 15)
-                    Rectangle(2).frame(width: 15, height: 20)
+                    Rectangle().id(1).frame(width: 10, height: 15)
+                    Rectangle().id(2).frame(width: 15, height: 20)
                 }
                 .padding(10)
                 
-                Rectangle(3).frame(minWidth: 10, maxWidth: 50)
+                Rectangle().id(3).frame(minWidth: 10, maxWidth: 50)
                 
                 VStack(spacing: 3) {
-                    Rectangle(4).padding(5)
-                    Rectangle(5).frame(width: 15, height: 12)
+                    Rectangle().id(4).padding(5)
+                    Rectangle().id(5).frame(width: 15, height: 12)
                 }
                 .frame(minHeight: 40, maxHeight: 60)
             },
@@ -54,18 +54,18 @@ final class ComplexTests: XCTestCase {
         Utils.assertLeafLayout(
             VStack(spacing: 12) {
                 HStack(spacing: 6) {
-                    Rectangle(1).frame(width: 30, height: 25)
-                    Rectangle(2).frame(minWidth: 20, maxWidth: 35)
-                    Rectangle(3).padding(4)
+                    Rectangle().id(1).frame(width: 30, height: 25)
+                    Rectangle().id(2).frame(minWidth: 20, maxWidth: 35)
+                    Rectangle().id(3).padding(4)
                 }
                 .frame(minHeight: 30, maxHeight: 40)
                 
-                Rectangle(4).frame(width: 80, height: 20)
+                Rectangle().id(4).frame(width: 80, height: 20)
                 
                 HStack(spacing: 8) {
-                    Rectangle(5).frame(width: 15, height: 15)
-                    Rectangle(6).frame(minWidth: 25, maxWidth: 40, minHeight: 10, maxHeight: 25)
-                    Rectangle(7).padding(3)
+                    Rectangle().id(5).frame(width: 15, height: 15)
+                    Rectangle().id(6).frame(minWidth: 25, maxWidth: 40, minHeight: 10, maxHeight: 25)
+                    Rectangle().id(7).padding(3)
                 }
                 .padding(5)
             },
@@ -85,18 +85,18 @@ final class ComplexTests: XCTestCase {
         Utils.assertLeafLayout(
             HStack(spacing: 5) {
                 VStack(spacing: 8) {
-                    Rectangle(1).frame(minWidth: 25, maxWidth: 45, minHeight: 20, maxHeight: 35)
-                    Rectangle(2).frame(width: 30, height: 25)
+                    Rectangle().id(1).frame(minWidth: 25, maxWidth: 45, minHeight: 20, maxHeight: 35)
+                    Rectangle().id(2).frame(width: 30, height: 25)
                 }
                 .padding(5)
                 .frame(minWidth: 40, maxWidth: 70)
                 
-                Rectangle(3).frame(minWidth: 20, maxWidth: 40, minHeight: 30, maxHeight: 50)
+                Rectangle().id(3).frame(minWidth: 20, maxWidth: 40, minHeight: 30, maxHeight: 50)
                 
                 VStack(spacing: 5) {
-                    Rectangle(4).padding(6)
-                    Rectangle(5).frame(width: 22, height: 18)
-                    Rectangle(6).frame(minWidth: 15, maxWidth: 30, minHeight: 12, maxHeight: 22)
+                    Rectangle().id(4).padding(6)
+                    Rectangle().id(5).frame(width: 22, height: 18)
+                    Rectangle().id(6).frame(minWidth: 15, maxWidth: 30, minHeight: 12, maxHeight: 22)
                 }
                 .frame(minHeight: 60, maxHeight: 80)
             },

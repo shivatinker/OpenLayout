@@ -8,6 +8,18 @@
 import OpenLayout
 import XCTest
 
+struct IDNodeAttributeKey: NodeAttributeKey {
+    typealias Value = Int?
+    
+    static let defaultValue: Int? = nil
+}
+
+extension LayoutItem {
+    func id(_ value: Int) -> some LayoutItem {
+        self.attribute(IDNodeAttributeKey.self, value)
+    }
+}
+
 struct Rectangle: LayoutLeafItem {
     struct Layout: LeafLayout {
         func sizeThatFits(_ size: ProposedSize) -> CGSize {
@@ -17,19 +29,14 @@ struct Rectangle: LayoutLeafItem {
         }
     }
     
-    let id: Int
     let layout = Layout()
-    
-    init(_ id: Int) {
-        self.id = id
-    }
 }
 
 @MainActor
 final class LayoutTests: XCTestCase {
     func testSimple() {
         Utils.assertLeafLayout(
-            Rectangle(1),
+            Rectangle().id(1),
             expectedLayout: """
             1: 0.0 0.0 100.0 100.0
             """
@@ -85,16 +92,26 @@ enum Utils {
         rect: CGRect
     ) -> [Int: CGRect] {
         let engine = LayoutEngine()
+        
         let result = engine.evaluateLayout(
             in: rect,
             root: root.makeNode()
         )
-        let leafs = result.collectLeafs()
+        
         var layout: [Int: CGRect] = [:]
-        for leaf in leafs {
-            guard let rectangle = leaf.item as? Rectangle else { continue }
-            layout[rectangle.id] = leaf.rect
+        
+        for item in result.items {
+            guard item.node.leafItem != nil else {
+                continue
+            }
+            
+            guard let id = item.attributes.value(for: IDNodeAttributeKey.self) else {
+                continue
+            }
+            
+            layout[id] = item.rect
         }
+        
         return layout
     }
 

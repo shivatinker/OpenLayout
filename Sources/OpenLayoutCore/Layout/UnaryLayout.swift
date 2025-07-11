@@ -40,6 +40,16 @@ private struct UnaryLayoutAdapter: Layout {
     }
 }
 
+struct TransparentLayout: UnaryLayout {
+    func sizeThatFits(_ proposal: ProposedSize, child: some LayoutSizeProvider) -> CGSize {
+        child.sizeThatFits(proposal)
+    }
+    
+    func placeChild(in rect: CGRect, child: inout some LayoutElement) {
+        child.place(at: rect.center, anchor: .center, proposal: ProposedSize(rect.size))
+    }
+}
+
 extension Collection {
     var onlyElement: Element? {
         guard self.count == 1 else { return nil }
