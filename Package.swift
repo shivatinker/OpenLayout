@@ -11,6 +11,14 @@ let package = Package(
             name: "OpenLayout",
             targets: ["OpenLayout"]
         ),
+        .library(
+            name: "OpenLayoutDSL",
+            targets: ["OpenLayoutDSL"]
+        ),
+        .library(
+            name: "OpenLayoutCore",
+            targets: ["OpenLayoutCore"]
+        ),
     ],
     targets: [
         .target(

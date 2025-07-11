@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "EC399D3F-12D0-47C7-99A5-1FBFB478AC27",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "OpenLayoutTests",
+        "name" : "OpenLayoutTests"
+      }
+    }
+  ],
+  "version" : 1
+}
