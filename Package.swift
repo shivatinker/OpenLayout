@@ -19,6 +19,10 @@ let package = Package(
             name: "OpenLayoutCore",
             targets: ["OpenLayoutCore"]
         ),
+        .library(
+            name: "OpenLayoutText",
+            targets: ["OpenLayoutText"]
+        ),
     ],
     targets: [
         .target(
@@ -30,11 +34,18 @@ let package = Package(
             dependencies: ["OpenLayoutCore"]
         ),
         .target(
+            name: "OpenLayoutText",
+            dependencies: ["OpenLayout"]
+        ),
+        .target(
             name: "OpenLayoutCore"
         ),
         .testTarget(
             name: "OpenLayoutTests",
-            dependencies: ["OpenLayout"]
+            dependencies: [
+                "OpenLayout",
+                "OpenLayoutText"
+            ]
         ),
     ]
 )
