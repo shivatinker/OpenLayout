@@ -10,6 +10,13 @@ import CoreGraphics
 public struct LayoutEngine {
     public init() {}
     
+    public func sizeThatFits(
+        root: LayoutNode,
+        proposal: ProposedSize
+    ) -> CGSize {
+        root.sizeThatFits(proposal)
+    }
+    
     public func layout(
         in rect: CGRect,
         root: LayoutNode,

@@ -16,7 +16,7 @@ private final class LayoutNodeCache {
     var sizeThatFits: [ProposedSize: CGSize] = [:]
 }
 
-public struct LayoutNode {
+public struct LayoutNode: LayoutSizeProvider {
     private let layout: Layout
     private let children: [LayoutNode]
     
@@ -24,14 +24,6 @@ public struct LayoutNode {
     private let attributes: NodeAttributes
     
     private let cache = LayoutNodeCache()
-    
-    private struct SizeProviderAdapter: LayoutSizeProvider {
-        let node: LayoutNode
-        
-        func sizeThatFits(_ size: ProposedSize) -> CGSize {
-            self.node.sizeThatFits(size)
-        }
-    }
     
     private struct ChildElement: LayoutElement {
         let node: LayoutNode
@@ -47,7 +39,7 @@ public struct LayoutNode {
         }
     }
     
-    private func sizeThatFits(
+    public func sizeThatFits(
         _ proposal: ProposedSize
     ) -> CGSize {
         self.mergingAttributes {
@@ -57,9 +49,7 @@ public struct LayoutNode {
             else {
                 let size = self.layout.sizeThatFits(
                     proposal,
-                    children: self.children.map { child in
-                        SizeProviderAdapter(node: child)
-                    }
+                    children: self.children
                 )
                 
                 self.cache.sizeThatFits[proposal] = size
