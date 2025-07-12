@@ -25,10 +25,10 @@ public struct CoreTextLayoutEngine: TextLayoutEngine {
     public func sizeThatFits(
         _ proposal: ProposedSize,
         text: String,
-        attributes: TextAttributes
+        font: Font
     ) -> CGSize {
-        // Create attributed string with the given attributes
-        let attributedString = self.createAttributedString(text: text, attributes: attributes)
+        let ctFont = CTFontCreateWithName(font.name as CFString, font.size, nil)
+        let attributedString = self.createAttributedString(text: text, font: ctFont)
         
         // Create framesetter
         let framesetter = CTFramesetterCreateWithAttributedString(attributedString)
@@ -48,10 +48,9 @@ public struct CoreTextLayoutEngine: TextLayoutEngine {
             &fitRange
         )
         
-        let font = attributes.font
-        let ascent = CTFontGetAscent(font)
-        let descent = CTFontGetDescent(font)
-        let leading = CTFontGetLeading(font)
+        let ascent = CTFontGetAscent(ctFont)
+        let descent = CTFontGetDescent(ctFont)
+        let leading = CTFontGetLeading(ctFont)
         let lineHeight = ascent + descent + leading
         
         // If the text is empty, return font height
@@ -66,16 +65,11 @@ public struct CoreTextLayoutEngine: TextLayoutEngine {
     
     private func createAttributedString(
         text: String,
-        attributes: TextAttributes
+        font: CTFont
     ) -> NSAttributedString {
-        let font = attributes.font
-        let color = attributes.color
-        
         let attributes: [NSAttributedString.Key: Any] = [
             NSAttributedString.Key(rawValue: kCTFontAttributeName as String): font,
-            NSAttributedString.Key(rawValue: kCTForegroundColorAttributeName as String): color,
         ]
-        
         let attributedString = NSAttributedString(string: text, attributes: attributes)
         return attributedString
     }

@@ -18,15 +18,12 @@ public struct TextLayout: LeafLayout {
     
     public func sizeThatFits(_ proposal: ProposedSize) -> CGSize {
         let proposal = proposal.ceil()
-        
-        let attributes = TextAttributes.current
-        
+        let font = NodeAttributes.current.font
         let result = self.engine.sizeThatFits(
             proposal,
             text: self.text,
-            attributes: attributes
+            font: font
         )
-        
         return result
     }
 }

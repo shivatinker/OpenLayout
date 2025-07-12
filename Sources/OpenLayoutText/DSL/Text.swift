@@ -19,8 +19,4 @@ public struct Text: LayoutLeafItem {
     }
 }
 
-extension LayoutItem {
-    public func font(_ font: CTFont) -> some LayoutItem {
-        fatalError()
-    }
-}
+

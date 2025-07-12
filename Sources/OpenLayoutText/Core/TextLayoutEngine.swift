@@ -11,6 +11,6 @@ public protocol TextLayoutEngine {
     func sizeThatFits(
         _ proposal: ProposedSize,
         text: String,
-        attributes: TextAttributes
+        font: Font
     ) -> CGSize
 }

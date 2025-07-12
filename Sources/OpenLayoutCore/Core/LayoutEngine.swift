@@ -21,7 +21,6 @@ public struct LayoutEngine {
         root.layout(
             at: anchorPoint,
             proposition: proposedSize,
-            attributes: NodeAttributes(),
             visitor: visitor
         )
     }

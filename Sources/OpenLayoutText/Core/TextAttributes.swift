@@ -5,29 +5,24 @@
 //  Created by Andrii Zinoviev on 11.07.2025.
 //
 
-@preconcurrency import CoreText
 import OpenLayout
+import CoreText
 
-private struct TextAttributesKey: NodeAttributeKey {
-    typealias Value = TextAttributes
-    
-    static let defaultValue = TextAttributes()
-}
+// MARK: - Text Attribute Key
 
-public struct TextAttributes: Sendable {
-    public var font = CTFontCreateWithName("Helvetica" as CFString, 12, nil)
-    public var color = CGColor(gray: 0.0, alpha: 1.0)
-    public var multilineTextAlignment: Alignment.Horizontal = .left
-    
-    public init() {}
-    
-    static var current: TextAttributes {
-        NodeAttributes.current.value(for: TextAttributesKey.self)
-    }
+private struct FontNodeAttributeKey: NodeAttributeKey {
+    typealias Value = Font
+    static let defaultValue: Font = .default
 }
 
 extension NodeAttributes {
-    public var textAttributes: TextAttributes {
-        self.value(for: TextAttributesKey.self)
+    public var font: Font {
+        self.value(for: FontNodeAttributeKey.self)
+    }
+}
+
+extension LayoutItem {
+    public func font(_ font: Font) -> some LayoutItem {
+        self.attribute(FontNodeAttributeKey.self, font)
     }
 }

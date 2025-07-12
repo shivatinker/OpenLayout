@@ -47,37 +47,40 @@ public struct LayoutNode {
         }
     }
     
-    private func sizeThatFits(_ proposal: ProposedSize) -> CGSize {
-        if let cachedSize = self.cache.sizeThatFits[proposal] {
-            return cachedSize
-        }
-        else {
-            let size = self.layout.sizeThatFits(
-                proposal,
-                children: self.children.map(SizeProviderAdapter.init(node:))
-            )
-            
-            self.cache.sizeThatFits[proposal] = size
-            return size
+    private func sizeThatFits(
+        _ proposal: ProposedSize
+    ) -> CGSize {
+        self.mergingAttributes {
+            if let cachedSize = self.cache.sizeThatFits[proposal] {
+                return cachedSize
+            }
+            else {
+                let size = self.layout.sizeThatFits(
+                    proposal,
+                    children: self.children.map { child in
+                        SizeProviderAdapter(node: child)
+                    }
+                )
+                
+                self.cache.sizeThatFits[proposal] = size
+                return size
+            }
         }
     }
     
     func layout(
         at point: AnchorPoint,
         proposition: ProposedSize,
-        attributes: NodeAttributes,
         visitor: (EvaluatedItem) -> Void
     ) {
-        let childAttributes = attributes.merge(with: self.attributes)
-        
-        NodeAttributes.$current.withValue(childAttributes) {
+        self.mergingAttributes {
             let selfSize = self.sizeThatFits(proposition)
             let selfRect = CGRect(anchorPoint: point, size: selfSize)
             
             visitor(
                 EvaluatedItem(
                     node: self,
-                    attributes: childAttributes,
+                    attributes: NodeAttributes.current,
                     rect: selfRect
                 )
             )
@@ -93,7 +96,6 @@ public struct LayoutNode {
                     child.node.layout(
                         at: AnchorPoint(point: rect.center, alignment: .center),
                         proposition: ProposedSize(rect.size),
-                        attributes: childAttributes,
                         visitor: visitor
                     )
                 }
@@ -101,6 +103,14 @@ public struct LayoutNode {
         }
     }
     
+    private func mergingAttributes<T>(_ body: () -> T) -> T {
+        let childAttributes = NodeAttributes.current.merge(with: self.attributes)
+        
+        return NodeAttributes.$current.withValue(childAttributes) {
+            body()
+        }
+    }
+        
     // MARK: Constructors
     
     private init(

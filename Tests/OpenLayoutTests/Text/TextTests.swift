@@ -13,13 +13,13 @@ import XCTest
 final class TextTests: XCTestCase {
     func testCoreTextLayoutEngine() {
         let engine = CoreTextLayoutEngine()
-        let attributes = TextAttributes()
+        let font = Font(name: "Helvetica", size: 12)
         
         // Test simple text
         let size = engine.sizeThatFits(
             .unspecified,
             text: "Hello, World!",
-            attributes: attributes
+            font: font
         )
         // Replace the following with the actual values you see printed
         XCTAssertEqual(size.width, 68.47265625, accuracy: 0.0001)
@@ -29,7 +29,7 @@ final class TextTests: XCTestCase {
         let constrainedSize = engine.sizeThatFits(
             ProposedSize(width: 50, height: nil),
             text: "This is a longer text that should wrap to multiple lines",
-            attributes: attributes
+            font: font
         )
         // Replace the following with the actual values you see printed
         XCTAssertEqual(constrainedSize.width, 44.677734375, accuracy: 0.0001)
@@ -38,13 +38,13 @@ final class TextTests: XCTestCase {
     
     func testNotClipping() {
         let engine = CoreTextLayoutEngine()
-        let attributes = TextAttributes()
+        let font = Font(name: "Helvetica", size: 12)
             
         // Test simple text
         let size = engine.sizeThatFits(
             ProposedSize(width: 300, height: 30),
             text: "This one is super multiline, check it out, it should wrap properly. It should also be aligned to the left. It should also be styled.",
-            attributes: attributes
+            font: font
         )
         
         XCTAssertEqual(size.width, 286.798828125, accuracy: 0.0001)
@@ -53,13 +53,13 @@ final class TextTests: XCTestCase {
     
     func testEmptyString() {
         let engine = CoreTextLayoutEngine()
-        let attributes = TextAttributes()
+        let font = Font(name: "Helvetica", size: 12)
         
         // Test empty string
         let emptySize = engine.sizeThatFits(
             .unspecified,
             text: "",
-            attributes: attributes
+            font: font
         )
         
         // Empty string should have zero width but height based on font metrics
