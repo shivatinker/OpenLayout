@@ -33,12 +33,10 @@ public struct CoreTextLayoutEngine: TextLayoutEngine {
         // Create framesetter
         let framesetter = CTFramesetterCreateWithAttributedString(attributedString)
         
-        // Determine the constraint size based on the proposal
-        let constraintSize = proposal.replacingUnspecifiedDimensions(
-            by: CGSize(
-                width: CGFloat.infinity,
-                height: CGFloat.infinity
-            )
+        // Always use .infinity for height to avoid cropping text vertically
+        let constraintSize = CGSize(
+            width: proposal.width ?? CGFloat.infinity,
+            height: CGFloat.infinity
         )
         
         var fitRange = CFRange()

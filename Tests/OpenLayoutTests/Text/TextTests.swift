@@ -36,6 +36,21 @@ final class TextTests: XCTestCase {
         XCTAssertEqual(constrainedSize.height, 105.0, accuracy: 0.0001)
     }
     
+    func testNotClipping() {
+        let engine = CoreTextLayoutEngine()
+        let attributes = TextAttributes()
+            
+        // Test simple text
+        let size = engine.sizeThatFits(
+            ProposedSize(width: 300, height: 30),
+            text: "This one is super multiline, check it out, it should wrap properly. It should also be aligned to the left. It should also be styled.",
+            attributes: attributes
+        )
+        
+        XCTAssertEqual(size.width, 286.798828125, accuracy: 0.0001)
+        XCTAssertEqual(size.height, 45, accuracy: 0.0001)
+    }
+    
     func testEmptyString() {
         let engine = CoreTextLayoutEngine()
         let attributes = TextAttributes()
@@ -71,7 +86,7 @@ final class TextTests: XCTestCase {
             .id(1)
             .frame(width: 50),
             expectedLayout: """
-            1: 27.3 5.0 45.4 90.0
+            1: 25.3 -47.5 49.4 195.0
             """
         )
     }
@@ -87,9 +102,33 @@ final class TextTests: XCTestCase {
             }
             .frame(maxWidth: .infinity, alignment: .left),
             expectedLayout: """
-            1: 0.0 1.0 28.7 30.0
-            2: 36.7 1.0 52.7 45.0
-            3: 36.7 54.0 47.4 45.0
+            1: 0.0 -59.0 28.7 30.0
+            2: 36.7 -59.0 57.4 135.0
+            3: 36.7 84.0 53.4 75.0
+            """
+        )
+    }
+    
+    func testMultiline() {
+        Utils.assertLeafLayout(
+            VStack(alignment: .left, spacing: 20) {
+                Rectangle()
+                    .frame(height: 1)
+                
+                Text("This one is super multiline, check it out, it should wrap properly. It should also be aligned to the left. It should also be styled.")
+                    .id(1)
+                
+                Rectangle()
+                    .frame(width: 200, height: 50)
+                
+                Rectangle()
+                    .frame(height: 1)
+            }
+            .frame(width: 300)
+            .padding(50),
+            rect: CGRect(origin: .zero, size: CGSize(width: 700, height: 700)),
+            expectedLayout: """
+            1: 200.0 292.5 286.8 45.0
             """
         )
     }

@@ -16,12 +16,18 @@ private struct TextAttributesKey: NodeAttributeKey {
 
 public struct TextAttributes: Sendable {
     public var font = CTFontCreateWithName("Helvetica" as CFString, 12, nil)
-    public var color = CGColor.black
+    public var color = CGColor(gray: 0.0, alpha: 1.0)
     public var multilineTextAlignment: Alignment.Horizontal = .left
     
     public init() {}
     
     static var current: TextAttributes {
         NodeAttributes.current.value(for: TextAttributesKey.self)
+    }
+}
+
+extension NodeAttributes {
+    public var textAttributes: TextAttributes {
+        self.value(for: TextAttributesKey.self)
     }
 }
