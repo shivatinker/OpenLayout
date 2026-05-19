@@ -136,6 +136,16 @@ final class SwiftUICompatibilityTests: XCTestCase {
         .setSize(CGSize(width: 200, height: 200))
         .check()
     }
+    
+    func testMixedHStack() {
+        SwiftUITest {
+            HStack(spacing: 10) {
+                Rect(1).frame(minWidth: 30, maxWidth: 100)
+                Rect(2).frame(width: 10)
+            }
+        }
+        .check()
+    }
 
     // Nested backgrounds and background behind containers with padding
     func testBackgroundVariants() {
@@ -169,6 +179,27 @@ final class SwiftUICompatibilityTests: XCTestCase {
             }
         }
         .setSize(CGSize(width: 200, height: 350))
+        .check()
+    }
+
+    func testLargeVStack() {
+        SwiftUITest {
+            VStack(spacing: 6) {
+                Rect(1).frame(height: 20) // fixed height
+                Rect(2) // fully flexible
+                Rect(3).frame(minHeight: 10, maxHeight: 30) // clamped flex
+                Rect(4).fixedSize() // intrinsic only
+                Rect(5).padding(.vertical, 8) // padded flex
+                Rect(6).frame(height: 16).padding(.horizontal, 12) // fixed + h-pad
+                Rect(7).frame(minHeight: 20, maxHeight: .infinity) // unbounded flex
+                Rect(8).frame(height: 24) // fixed height
+                Rect(9).frame(minHeight: 8, maxHeight: 20) // clamped flex
+                Rect(10).fixedSize(horizontal: false, vertical: true) // v-fixed only
+                Rect(11).padding(4).frame(minHeight: 12, maxHeight: 40) // padded then clamped
+                Rect(12).frame(maxHeight: .infinity) // unbounded flex
+            }
+        }
+        .setSize(CGSize(width: 160, height: 400))
         .check()
     }
 
