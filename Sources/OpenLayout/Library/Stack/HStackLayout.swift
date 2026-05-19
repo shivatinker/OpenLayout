@@ -8,9 +8,13 @@
 import CoreGraphics
 
 public struct HStackLayout: ContainerLayout {
+    public let alignment: Alignment.Vertical
+    public let spacing: CGFloat
     private let engine: StackLayoutEngine
 
     public init(alignment: Alignment.Vertical = .center, spacing: CGFloat) {
+        self.alignment = alignment
+        self.spacing = spacing
         self.engine = StackLayoutEngine(spacing: spacing, axis: .horizontal, alignment: alignment.stackAlignment)
     }
 

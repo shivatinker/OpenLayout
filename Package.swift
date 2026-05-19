@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "OpenLayout",
+    platforms: [.macOS(.v15)],
     products: [
         .library(
             name: "OpenLayout",

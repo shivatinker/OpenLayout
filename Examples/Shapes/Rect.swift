@@ -8,6 +8,7 @@
 import CoreFoundation
 import OpenLayout
 import OpenLayoutDSL
+import SwiftUI
 
 struct RectLayout: LeafLayout {
     func sizeThatFits(proposal: ProposedSize) -> CGSize {
@@ -28,5 +29,14 @@ struct Rect: LayoutItem {
             layout: RectLayout(),
             data: self.id
         )
+    }
+}
+
+extension Rect: SwiftUIViewProvider {
+    static let fillColor = Color(red: 0, green: 0, blue: 1)
+
+    func makeSwiftUIView() -> some View {
+        Rectangle()
+            .fill(Self.fillColor)
     }
 }
