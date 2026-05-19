@@ -9,7 +9,6 @@ import AppKit
 import CoreGraphics
 import OpenLayout
 import OpenLayoutDSL
-@testable import Shapes
 import SwiftUI
 import XCTest
 

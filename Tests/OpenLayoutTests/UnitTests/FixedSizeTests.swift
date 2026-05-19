@@ -8,7 +8,6 @@
 import CoreGraphics
 import OpenLayout
 import OpenLayoutDSL
-@testable import Shapes
 import XCTest
 
 final class FixedSizeTests: XCTestCase {

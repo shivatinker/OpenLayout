@@ -15,10 +15,6 @@ let package = Package(
             name: "OpenLayoutDSL",
             targets: ["OpenLayoutDSL"]
         ),
-        .library(
-            name: "Shapes",
-            targets: ["Shapes"]
-        ),
     ],
     targets: [
         .target(
@@ -28,14 +24,9 @@ let package = Package(
             name: "OpenLayoutDSL",
             dependencies: ["OpenLayout"]
         ),
-        .target(
-            name: "Shapes",
-            dependencies: ["OpenLayoutDSL"],
-            path: "Examples/Shapes"
-        ),
         .testTarget(
             name: "OpenLayoutTests",
-            dependencies: ["OpenLayout", "OpenLayoutDSL", "Shapes"]
+            dependencies: ["OpenLayout", "OpenLayoutDSL"]
         ),
     ],
     swiftLanguageModes: [.v6]
