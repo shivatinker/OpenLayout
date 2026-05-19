@@ -20,5 +20,5 @@ public struct ArrayBuilder<Element> {
     public static func buildEither(second: [Element]) -> [Element] { second }
     public static func buildIf(_ element: [Element]?) -> [Element] { element ?? [] }
     public static func buildPartialBlock(first: Never) -> [Element] {}
-    public static func buildArray(_ components: [[Element]]) -> [Element] { components.flatMap { $0 } }
+    public static func buildArray(_ components: [[Element]]) -> [Element] { components.flatMap(\.self) }
 }

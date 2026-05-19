@@ -11,9 +11,14 @@ import OpenLayoutDSL
 @testable import Shapes
 import XCTest
 
-struct LayoutTest {
+final class LayoutTest {
     private let item: LayoutItem
     private var rect = CGRect(origin: .zero, size: CGSize(width: 100.0, height: 100.0))
+
+    func setFrame(_ rect: CGRect) -> LayoutTest {
+        self.rect = rect
+        return self
+    }
     
     init(_ item: () -> LayoutItem) {
         self.item = item()
