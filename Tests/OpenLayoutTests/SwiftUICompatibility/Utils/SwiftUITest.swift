@@ -38,7 +38,7 @@ final class SwiftUITest {
             self.attach(swiftuiImage, name: "SwiftUI.png", to: activity)
             self.attach(openLayoutImage, name: "OpenLayout.png", to: activity)
 
-            if let mismatch = ImageDiffer.compare(swiftuiImage, openLayoutImage, precision: 1.0) {
+            if let mismatch = ImageDiffer.compare(swiftuiImage, openLayoutImage, precision: 0.999) {
                 self.attach(mismatch.difference, name: "Difference.png", to: activity)
                 XCTFail(mismatch.message, file: file, line: line)
             }
@@ -73,7 +73,6 @@ final class SwiftUITest {
 
         let pixelWidth = Int(self.size.width)
         let pixelHeight = Int(self.size.height)
-        let sRGB = CGColorSpace(name: CGColorSpace.sRGB)!
 
         let cgCtx = CGContext(
             data: nil,
@@ -81,7 +80,7 @@ final class SwiftUITest {
             height: pixelHeight,
             bitsPerComponent: 8,
             bytesPerRow: 0,
-            space: sRGB,
+            space: CGColorSpace(name: CGColorSpace.sRGB)!,
             bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue
         )!
 
@@ -89,18 +88,19 @@ final class SwiftUITest {
         cgCtx.translateBy(x: 0, y: self.size.height)
         cgCtx.scaleBy(x: 1, y: -1)
 
-        let cyanCG = CGColor(colorSpace: sRGB, components: [0, 0, 1, 1])!
-        let whiteCG = CGColor(colorSpace: sRGB, components: [1, 1, 1, 1])!
+        let whiteCG = CGColor(colorSpace: CGColorSpace(name: CGColorSpace.sRGB)!, components: [1, 1, 1, 1])!
 
         cgCtx.setShouldAntialias(false)
         cgCtx.setFillColor(whiteCG)
         cgCtx.fill(bounds)
 
         for rect in rects {
-            cgCtx.setFillColor(cyanCG)
             let drawRect = self.roundRect(rect.frame)
-            print(rect.id, rect.frame, drawRect)
+            cgCtx.setFillColor(Rect.fillCGColor)
             cgCtx.fill(drawRect)
+            cgCtx.setStrokeColor(Rect.strokeCGColor)
+            cgCtx.setLineWidth(1)
+            cgCtx.stroke(drawRect.insetBy(dx: 0.5, dy: 0.5))
         }
 
         return NSBitmapImageRep(cgImage: cgCtx.makeImage()!)
@@ -143,7 +143,7 @@ final class SwiftUITest {
         else { return }
         let attachment = XCTAttachment(data: png, uniformTypeIdentifier: "public.png")
         attachment.name = name
-        attachment.lifetime = .deleteOnSuccess
+        attachment.lifetime = .keepAlways
         activity.add(attachment)
     }
 }

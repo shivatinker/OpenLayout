@@ -68,8 +68,9 @@ private func compareImages(_ old: NSImage, _ new: NSImage, precision: Float) -> 
         defer { i += 1 }
         if oldBytes[i] != newBytes[i] { diff += 1 }
     }
+    let actual = 1 - Float(diff) / Float(byteCount)
+    print("Precision: \(actual)")
     if diff > threshold {
-        let actual = 1 - Float(diff) / Float(byteCount)
         return "Actual precision \(actual) is less than required \(precision)."
     }
     return nil

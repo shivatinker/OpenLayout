@@ -6,6 +6,7 @@
 //
 
 import CoreFoundation
+import CoreGraphics
 import OpenLayout
 import OpenLayoutDSL
 import SwiftUI
@@ -33,10 +34,13 @@ struct Rect: LayoutItem {
 }
 
 extension Rect: SwiftUIViewProvider {
-    static let fillColor = Color(red: 0, green: 0, blue: 1)
+    private static let sRGB = CGColorSpace(name: CGColorSpace.sRGB)!
+    static let fillCGColor = CGColor(colorSpace: sRGB, components: [0, 0, 1, 1])!
+    static let strokeCGColor = CGColor(colorSpace: sRGB, components: [0, 0, 0, 1])!
 
     func makeSwiftUIView() -> some View {
         Rectangle()
-            .fill(Self.fillColor)
+            .fill(Color(cgColor: Self.fillCGColor))
+            .border(Color(cgColor: Self.strokeCGColor), width: 1)
     }
 }
