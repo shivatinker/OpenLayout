@@ -43,7 +43,7 @@ final class SwiftUICompatibilityTests: XCTestCase {
                     }
                     Rect(4).padding(.horizontal, 8)
                     HStack(spacing: 4) {
-                        Rect(5).background(Rect(6))
+                        Rect(5).padding(6).background(Rect(6))
                         VStack(spacing: 4) {
                             Rect(7).fixedSize()
                             Rect(8)
@@ -73,9 +73,102 @@ final class SwiftUICompatibilityTests: XCTestCase {
                         Rect(20).frame(maxWidth: .infinity)
                     }
                 }
+                .background(Rect(21))
             }
         }
         .setSize(CGSize(width: 300, height: 250))
+        .check()
+    }
+
+    // Non-center stack alignments — tricky due to .left/.right → .leading/.trailing mapping
+    func testStackAlignments() {
+        SwiftUITest {
+            VStack(spacing: 10) {
+                HStack(alignment: .top, spacing: 6) {
+                    Rect(1).frame(height: 20)
+                    Rect(2).frame(height: 50)
+                    Rect(3).frame(height: 35)
+                }
+                HStack(alignment: .bottom, spacing: 6) {
+                    Rect(4).frame(height: 20)
+                    Rect(5).frame(height: 50)
+                    Rect(6).frame(height: 35)
+                }
+                VStack(alignment: .left, spacing: 4) {
+                    Rect(7).frame(width: 50)
+                    Rect(8).frame(width: 80)
+                    Rect(9).frame(width: 30)
+                }
+                VStack(alignment: .right, spacing: 4) {
+                    Rect(10).frame(width: 50)
+                    Rect(11).frame(width: 80)
+                    Rect(12).frame(width: 30)
+                }
+            }
+        }
+        .setSize(CGSize(width: 200, height: 400))
+        .check()
+    }
+
+    // fixedSize() preventing expansion in stacks, and overriding flexible frame constraints
+    func testFixedSizeInStack() {
+        SwiftUITest {
+            VStack(spacing: 8) {
+                // fixedSize locks a child to intrinsic size inside HStack
+                HStack(spacing: 6) {
+                    Rect(1).fixedSize()
+                    Rect(2)
+                    Rect(3).fixedSize()
+                }
+                // fixedSize overrides flexible frame — fixedSize wins
+                HStack(spacing: 6) {
+                    Rect(4).fixedSize().frame(minWidth: 50, maxWidth: 80)
+                    Rect(5).frame(minWidth: 50, maxWidth: 80)
+                }
+                // fixedSize horizontal only
+                HStack(spacing: 6) {
+                    Rect(6).fixedSize(horizontal: true, vertical: false)
+                    Rect(7).fixedSize(horizontal: false, vertical: true)
+                    Rect(8)
+                }
+            }
+        }
+        .setSize(CGSize(width: 200, height: 200))
+        .check()
+    }
+
+    // Nested backgrounds and background behind containers with padding
+    func testBackgroundVariants() {
+        SwiftUITest {
+            VStack(spacing: 10) {
+                // Chained backgrounds — outermost background wraps all
+                Rect(1)
+                    .padding(6)
+                    .background(Rect(2))
+                    .padding(6)
+                    .background(Rect(3))
+                // Background behind HStack with padding — background extends beyond children
+                HStack(spacing: 4) {
+                    Rect(4).frame(width: 30, height: 30)
+                    Rect(5).frame(width: 30, height: 30)
+                }
+                .padding(8)
+                .background(Rect(6))
+                // Background where background itself has padding inward
+                Rect(7)
+                    .background(
+                        Rect(8).padding(6)
+                    )
+                // Background behind VStack
+                VStack(spacing: 4) {
+                    Rect(9).frame(width: 50)
+                    Rect(10).frame(width: 70)
+                }
+                .padding(6)
+                .background(Rect(11))
+            }
+        }
+        .setSize(CGSize(width: 200, height: 350))
         .check()
     }
 
