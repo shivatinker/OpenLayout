@@ -96,7 +96,7 @@ final class SwiftUITest {
 
         for rect in rects {
             let drawRect = self.roundRect(rect.frame)
-            cgCtx.setFillColor(Rect.fillCGColor)
+            cgCtx.setFillColor(Rect.fillCGColor(for: rect.id))
             cgCtx.fill(drawRect)
             cgCtx.setStrokeColor(Rect.strokeCGColor)
             cgCtx.setLineWidth(1)

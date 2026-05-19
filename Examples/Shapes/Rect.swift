@@ -35,12 +35,29 @@ struct Rect: LayoutItem {
 
 extension Rect: SwiftUIViewProvider {
     private static let sRGB = CGColorSpace(name: CGColorSpace.sRGB)!
-    static let fillCGColor = CGColor(colorSpace: sRGB, components: [0, 0, 1, 1])!
+
     static let strokeCGColor = CGColor(colorSpace: sRGB, components: [0, 0, 0, 1])!
+
+    private static let fillCGColors: [CGColor] = [
+        CGColor(colorSpace: sRGB, components: [0.20, 0.60, 1.00, 1])!,
+        CGColor(colorSpace: sRGB, components: [0.20, 0.80, 0.40, 1])!,
+        CGColor(colorSpace: sRGB, components: [1.00, 0.80, 0.20, 1])!,
+        CGColor(colorSpace: sRGB, components: [1.00, 0.40, 0.20, 1])!,
+        CGColor(colorSpace: sRGB, components: [0.80, 0.20, 0.80, 1])!,
+        CGColor(colorSpace: sRGB, components: [0.20, 0.80, 0.80, 1])!,
+        CGColor(colorSpace: sRGB, components: [1.00, 0.60, 0.80, 1])!,
+        CGColor(colorSpace: sRGB, components: [0.60, 0.40, 1.00, 1])!,
+        CGColor(colorSpace: sRGB, components: [0.40, 1.00, 0.60, 1])!,
+        CGColor(colorSpace: sRGB, components: [1.00, 1.00, 0.40, 1])!,
+    ]
+
+    static func fillCGColor(for id: Int) -> CGColor {
+        self.fillCGColors[id % self.fillCGColors.count]
+    }
 
     func makeSwiftUIView() -> some View {
         Rectangle()
-            .fill(Color(cgColor: Self.fillCGColor))
+            .fill(Color(cgColor: Self.fillCGColor(for: self.id)))
             .border(Color(cgColor: Self.strokeCGColor), width: 1)
     }
 }
