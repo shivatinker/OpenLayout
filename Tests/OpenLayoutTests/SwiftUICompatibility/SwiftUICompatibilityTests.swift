@@ -228,6 +228,42 @@ final class SwiftUICompatibilityTests: XCTestCase {
         .check()
     }
     
+    func testStackIdealSize() {
+        SwiftUITest {
+            HStack(spacing: 8) {
+                // VStack with fixedSize — ignores proposed height, uses sum of children's ideal heights.
+                // Flexible frames resolve to their ideal (min) size when proposed nil.
+                VStack(spacing: 4) {
+                    Rect(1).frame(width: 40, height: 20)
+                    Rect(2).frame(minHeight: 10, maxHeight: 60)
+                    Rect(3).frame(width: 30, height: 15)
+                }
+                .fixedSize()
+
+                VStack(spacing: 4) {
+                    // HStack with fixedSize — ignores proposed width, uses sum of children's ideal widths.
+                    HStack(spacing: 4) {
+                        Rect(4).frame(width: 20, height: 20)
+                        Rect(5).frame(minWidth: 10, maxWidth: 100)
+                        Rect(6).frame(width: 15, height: 20)
+                    }
+                    .fixedSize()
+
+                    // Flexible view fills remaining space in the column
+                    Rect(7).frame(minHeight: 20, maxHeight: .infinity)
+                }
+
+                // fixedSize(horizontal:vertical:) — only fix one axis at a time
+                VStack(spacing: 4) {
+                    Rect(8).frame(minWidth: 20, maxWidth: 80).fixedSize(horizontal: true, vertical: false)
+                    Rect(9).frame(minHeight: 20, maxHeight: 80).fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .setSize(CGSize(width: 300, height: 200))
+        .check()
+    }
+
     func testSpacer() {
         SwiftUITest {
             VStack(spacing: 0) {

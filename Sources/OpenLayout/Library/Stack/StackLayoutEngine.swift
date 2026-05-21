@@ -129,66 +129,58 @@ struct StackLayoutEngine {
         availableLength: CGFloat,
         crossLengthProposal: CGFloat?
     ) -> [CalculatedElement] {
-        // Group indices by priority, process highest-priority groups first.
-        let groups = Dictionary(grouping: children.indices) { children[$0].layoutPriority() }
-        let sortedPriorities = groups.keys.sorted(by: >)
+        struct Group {
+            let priority: Int
+            let indices: [Int]
+        }
 
-        var result: [CalculatedElement] = Array(
+        let groups = Dictionary(grouping: children.indices) { children[$0].layoutPriority() }
+            .map { Group(priority: $0.key, indices: $0.value) }
+            .sorted { $0.priority > $1.priority }
+
+        var result = [CalculatedElement](
             repeating: CalculatedElement(proposal: .unspecified, size: .zero),
             count: children.count
         )
 
-        // remainingCount spans all groups and drives spacing reservation.
-        var remainingCount = children.count
         var remainingLength = availableLength
+        var remainingCount = children.count
 
-        for (groupPosition, priority) in sortedPriorities.enumerated() {
-            let groupIndices = groups[priority]!
-
-            // Reserve the minimum space claimed by all lower-priority children
-            // so that they can always satisfy their minimum size.
-            let lowerPriorityMinLength = sortedPriorities[(groupPosition + 1)...]
-                .flatMap { groups[$0]! }
-                .reduce(0.0) { sum, idx in
-                    sum + children[idx].sizeThatFits(proposal: ProposedSize(
-                        axis: self.axis, length: 0, crossLength: crossLengthProposal
-                    )).length(self.axis)
+        for (index, group) in groups.enumerated() {
+            let lowerMinLength = groups[(index + 1)...]
+                .flatMap(\.indices)
+                .reduce(0.0) { total, idx in
+                    total + self.minLength(of: children[idx], crossLengthProposal: crossLengthProposal)
                 }
 
-            // Within the group, measure least-flexible children first.
-            let sortedGroupIndices = groupIndices.sorted {
+            let sortedIndices = group.indices.sorted {
                 self.flexibility(for: children[$0], crossLengthProposal: crossLengthProposal) <
                     self.flexibility(for: children[$1], crossLengthProposal: crossLengthProposal)
             }
 
-            // Space is divided only among the children remaining in this group,
-            // not across all remaining children, so higher-priority children
-            // receive a larger share before lower-priority groups are considered.
-            var groupRemainingCount = sortedGroupIndices.count
+            var groupCount = sortedIndices.count
 
-            for index in sortedGroupIndices {
-                precondition(remainingCount > 0)
-                let totalRemainingSpacing = self.spacing * (CGFloat(remainingCount) - 1)
-                let remainingLengthWithoutSpacing = max(
-                    remainingLength - lowerPriorityMinLength - totalRemainingSpacing, 0.0
-                )
+            for index in sortedIndices {
+                let spacingReservation = self.spacing * CGFloat(remainingCount - 1)
+                let proposedLength = max(remainingLength - lowerMinLength - spacingReservation, 0) / CGFloat(groupCount)
 
-                let proposal = ProposedSize(
-                    axis: self.axis,
-                    length: remainingLengthWithoutSpacing / CGFloat(groupRemainingCount),
-                    crossLength: crossLengthProposal
-                )
-
+                let proposal = ProposedSize(axis: self.axis, length: proposedLength, crossLength: crossLengthProposal)
                 let size = children[index].sizeThatFits(proposal: proposal)
-                result[index] = CalculatedElement(proposal: proposal, size: size)
 
+                result[index] = CalculatedElement(proposal: proposal, size: size)
                 remainingLength = max(remainingLength - size.length(self.axis) - self.spacing, 0)
                 remainingCount -= 1
-                groupRemainingCount -= 1
+                groupCount -= 1
             }
         }
 
         return result
+    }
+
+    private func minLength(of element: any ChildMeasurement, crossLengthProposal: CGFloat?) -> CGFloat {
+        element.sizeThatFits(proposal: ProposedSize(
+            axis: self.axis, length: 0, crossLength: crossLengthProposal
+        )).length(self.axis)
     }
 
     private func flexibility(
