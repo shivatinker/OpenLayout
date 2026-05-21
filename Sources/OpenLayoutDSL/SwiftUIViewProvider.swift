@@ -117,6 +117,12 @@ extension OpenLayout.VStackLayout: SwiftUICompatibleLayout {
     }
 }
 
+extension Spacer: SwiftUIViewProvider {
+    public func makeSwiftUIView() -> some View {
+        SwiftUI.Spacer(minLength: self.minLength)
+    }
+}
+
 // MARK: - Alignment mappings
 
 extension OpenLayout.Alignment {

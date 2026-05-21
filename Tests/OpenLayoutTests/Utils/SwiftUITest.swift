@@ -48,7 +48,11 @@ final class SwiftUITest {
 
     private func renderSwiftUI() -> NSBitmapImageRep {
         let bitmap = self.makeBitmap()
-        let view = SwiftUISupport.swiftUIView(for: self.item).background(.white)
+        
+        let view = SwiftUISupport.swiftUIView(for: self.item)
+            .frame(width: self.size.width, height: self.size.height)
+            .background(.white)
+        
         let host = NSHostingView(rootView: view)
         host.frame = CGRect(origin: .zero, size: self.size)
         host.layout()
@@ -66,6 +70,8 @@ final class SwiftUITest {
         let bounds = CGRect(origin: .zero, size: self.size)
         node.place(frame: CGRect(point: bounds.anchorPoint(.center), anchor: .center, size: fittedSize))
         node.doLayout()
+        
+        print(LayoutNodeDumper().dump(node))
 
         var rects: [RectDrawable] = []
         collectRects(from: node, into: &rects)

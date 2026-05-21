@@ -9,7 +9,6 @@ import AppKit
 import CoreGraphics
 import OpenLayout
 import OpenLayoutDSL
-import SwiftUI
 import XCTest
 
 @MainActor
@@ -226,6 +225,86 @@ final class SwiftUICompatibilityTests: XCTestCase {
             }
         }
         .setSize(CGSize(width: 200, height: 200))
+        .check()
+    }
+    
+    func testSpacer() {
+        SwiftUITest {
+            VStack(spacing: 0) {
+                Rect(1).fixedSize()
+                Spacer()
+                Rect(2)
+            }
+        }
+        .check()
+    }
+
+    func testMultipleSpacers() {
+        SwiftUITest {
+            VStack(spacing: 8) {
+                // Three spacers in one HStack — split remaining width into three equal gaps
+                HStack(spacing: 0) {
+                    Spacer()
+                    Rect(1).frame(width: 20, height: 20)
+                    Spacer()
+                    Rect(2).frame(width: 30, height: 20)
+                    Spacer()
+                }
+
+                // Spacers with explicit minLength flanking a flexible view
+                HStack(spacing: 4) {
+                    Rect(3).fixedSize()
+                    Spacer(minLength: 12)
+                    Rect(4).frame(maxWidth: .infinity, minHeight: 20)
+                    Spacer(minLength: 12)
+                    Rect(5).fixedSize()
+                }
+
+                // Three columns, each with spacers in different positions
+                HStack(spacing: 8) {
+                    // Spacer at bottom — content floats to top
+                    VStack(spacing: 4) {
+                        Rect(6).frame(height: 20)
+                        Rect(7).frame(height: 20)
+                        Spacer()
+                    }
+
+                    // Spacer at top — content floats to bottom
+                    VStack(spacing: 4) {
+                        Spacer()
+                        Rect(8).frame(height: 20)
+                        Rect(9).frame(height: 20)
+                    }
+
+                    // Two spacers sandwiching a fixed view in the center
+                    VStack(spacing: 0) {
+                        Spacer()
+                        Rect(10).fixedSize()
+                        Spacer()
+                    }
+                }
+
+                // Horizontal spacers inside a VStack column, mixing with padding
+                VStack(spacing: 4) {
+                    HStack(spacing: 0) {
+                        Rect(11).frame(width: 30, height: 16)
+                        Spacer(minLength: 0)
+                        Rect(12).frame(width: 40, height: 16)
+                        Spacer(minLength: 0)
+                        Rect(13).frame(width: 20, height: 16)
+                    }
+                    HStack(spacing: 0) {
+                        Spacer()
+                        Rect(14).frame(width: 50, height: 16)
+                    }
+                    HStack(spacing: 0) {
+                        Rect(15).frame(width: 50, height: 16)
+                        Spacer()
+                    }
+                }
+            }
+        }
+        .setSize(CGSize(width: 300, height: 300))
         .check()
     }
 }

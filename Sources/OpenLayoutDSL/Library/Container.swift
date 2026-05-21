@@ -42,10 +42,18 @@ struct ContainerItem<Layout: ContainerLayout>: LayoutItem {
     let children: [any LayoutItem]
     
     func makeLayoutNode(context: LayoutContext) -> LayoutNode {
-        LayoutNode.makeContainerNode(
-            context: context,
+        var childContext = context
+        
+        if let layoutDirection = self.layout.layoutDirection() {
+            childContext.layoutDirection = layoutDirection
+        }
+        
+        return LayoutNode.makeContainerNode(
+            context: childContext,
             layout: self.layout,
-            children: self.children.map { $0.makeLayoutNode(context: context) }
+            children: self.children.map {
+                $0.makeLayoutNode(context: childContext)
+            }
         )
     }
 }

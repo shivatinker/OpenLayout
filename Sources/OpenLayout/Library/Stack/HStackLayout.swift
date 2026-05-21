@@ -25,4 +25,8 @@ public struct HStackLayout: ContainerLayout {
     public func placeChildren(_ children: [ChildPlacement], bounds: CGRect) {
         self.engine.placeChildren(children, in: bounds)
     }
+    
+    public func layoutDirection() -> Axis? {
+        .horizontal
+    }
 }
