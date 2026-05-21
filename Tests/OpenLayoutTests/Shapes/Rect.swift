@@ -17,6 +17,61 @@ struct RectLayout: LeafLayout {
     }
 }
 
+struct FakeTextLayout: LeafLayout {
+    let size: CGFloat
+    
+    func sizeThatFits(proposal: ProposedSize) -> CGSize {
+        let width = proposal.width ?? (self.size / 10)
+        
+        if width.isInfinite {
+            return CGSize(width: self.size / 10, height: 10)
+        }
+        
+        return CGSize(width: width, height: self.height(for: max(width, 1)))
+    }
+
+    private func height(for width: CGFloat) -> CGFloat {
+        max(self.size / width, 10)
+    }
+}
+
+private struct FakeTextSwiftUILayout: SwiftUI.Layout {
+    let size: CGFloat
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let width = proposal.width ?? (self.size / 10)
+        if width.isInfinite {
+            return CGSize(width: self.size / 10, height: 10)
+        }
+        return CGSize(width: width, height: max(self.size / max(width, 1), 10))
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {}
+}
+
+struct FakeText: LayoutItem {
+    let id: Int
+    let size: CGFloat
+    
+    func makeLayoutNode(context: LayoutContext) -> LayoutNode {
+        LayoutNode.makeLeafNode(
+            context: context,
+            layout: FakeTextLayout(size: self.size),
+            data: self.id
+        )
+    }
+}
+
+extension FakeText: SwiftUIViewProvider {
+    func makeSwiftUIView() -> some View {
+        FakeTextSwiftUILayout(size: self.size) {
+            // SwiftUI is buggy with layouts with no children.
+            Rectangle().opacity(0.0)
+        }
+        .background(Rect(self.id).makeSwiftUIView())
+    }
+}
+
 struct Rect: LayoutItem {
     let id: Int
     

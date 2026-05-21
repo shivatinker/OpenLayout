@@ -264,6 +264,126 @@ final class SwiftUICompatibilityTests: XCTestCase {
         .check()
     }
 
+    func testPaddingVariants() {
+        SwiftUITest {
+            VStack(spacing: 8) {
+                // Per-edge padding
+                HStack(spacing: 6) {
+                    Rect(1).padding(.top, 12)
+                    Rect(2).padding(.bottom, 12)
+                    Rect(3).padding(.left, 20)
+                    Rect(4).padding(.right, 20)
+                }
+                // Multi-edge sets
+                HStack(spacing: 6) {
+                    Rect(5).padding([.top, .left], 10)
+                    Rect(6).padding([.bottom, .right], 10)
+                    Rect(7).padding(.horizontal, 15)
+                    Rect(8).padding(.vertical, 15)
+                }
+                // Nested padding accumulates
+                Rect(9).padding(.left, 20).padding(.right, 10).padding(.vertical, 8)
+                // Padding around fixed-size children
+                HStack(spacing: 6) {
+                    Rect(10).frame(width: 30, height: 20).padding(8)
+                    Rect(11).frame(width: 40, height: 25).padding(.horizontal, 6)
+                }
+            }
+        }
+        .setSize(CGSize(width: 300, height: 300))
+        .check()
+    }
+
+    func testFrameVariants() {
+        SwiftUITest {
+            VStack(spacing: 8) {
+                // Fixed frame alignment
+                HStack(spacing: 6) {
+                    Rect(1).frame(width: 30, height: 20).frame(width: 60, height: 60, alignment: .topLeft)
+                    Rect(2).frame(width: 30, height: 20).frame(width: 60, height: 60, alignment: .bottomRight)
+                    Rect(3).frame(width: 30, height: 20).frame(width: 60, height: 60, alignment: .top)
+                }
+                // Flexible frame clamping
+                HStack(spacing: 6) {
+                    Rect(4).frame(minWidth: 20, maxWidth: 50)
+                    Rect(5).frame(minHeight: 20, maxHeight: 40)
+                    Rect(6).frame(minWidth: 10, maxWidth: 30, minHeight: 10, maxHeight: 30)
+                }
+                // maxWidth: .infinity to fill available space
+                HStack(spacing: 6) {
+                    Rect(7).frame(width: 40)
+                    Rect(8).frame(maxWidth: .infinity)
+                }
+                // Nested fixed frames — outer wins for placement, inner wins for size
+                HStack(spacing: 6) {
+                    Rect(9).frame(width: 50, height: 30).frame(width: 30, height: 50)
+                    Rect(10).frame(width: 40, height: 20).frame(width: 60, height: 40, alignment: .bottomRight)
+                }
+            }
+        }
+        .setSize(CGSize(width: 300, height: 250))
+        .check()
+    }
+
+    func testFixedSizeVariants() {
+        SwiftUITest {
+            VStack(spacing: 8) {
+                // fixedSize both axes
+                HStack(spacing: 8) {
+                    Rect(1).fixedSize()
+                    Rect(2).frame(maxWidth: .infinity)
+                }
+                // fixedSize axis order with padding — both orderings should produce same result
+                HStack(spacing: 8) {
+                    Rect(3).fixedSize().padding(10)
+                    Rect(4).padding(10).fixedSize()
+                }
+                // fixedSize with flexible frame — fixedSize overrides the frame constraint
+                HStack(spacing: 8) {
+                    Rect(5).fixedSize().frame(minWidth: 50, maxWidth: 80)
+                    Rect(6).frame(minWidth: 50, maxWidth: 80)
+                }
+                // per-axis fixedSize in an HStack
+                HStack(spacing: 8) {
+                    Rect(7).fixedSize(horizontal: true, vertical: false)
+                    Rect(8).fixedSize(horizontal: false, vertical: true)
+                    Rect(9)
+                }
+            }
+        }
+        .setSize(CGSize(width: 250, height: 250))
+        .check()
+    }
+
+    func testBackgroundWithFrames() {
+        SwiftUITest {
+            VStack(spacing: 8) {
+                // Background sized to flexible frame
+                Rect(1)
+                    .frame(minWidth: 40, maxWidth: 100, minHeight: 20, maxHeight: 60)
+                    .background(Rect(2))
+                // Background behind a stack with padding — background covers padding area too
+                HStack(spacing: 4) {
+                    Rect(3).frame(width: 30, height: 30)
+                    Rect(4).frame(width: 30, height: 30)
+                }
+                .padding(10)
+                .background(Rect(5))
+                // Nested background with its own frame constraint
+                Rect(6)
+                    .background(Rect(7).frame(width: 20, height: 20))
+                // Background with padding applied to the background layer
+                Rect(8)
+                    .padding(12)
+                    .background(Rect(9))
+                    .padding(6)
+                    .background(Rect(10))
+            }
+        }
+        .setSize(CGSize(width: 200, height: 300))
+        .check()
+    }
+
     func testSpacer() {
         SwiftUITest {
             VStack(spacing: 0) {
@@ -341,6 +461,104 @@ final class SwiftUICompatibilityTests: XCTestCase {
             }
         }
         .setSize(CGSize(width: 300, height: 300))
+        .check()
+    }
+    
+    func testFakeText() {
+        SwiftUITest {
+            VStack {
+                FakeText(id: 1, size: 3300)
+                FakeText(id: 2, size: 1200)
+                FakeText(id: 3, size: 2200)
+            }
+        }
+        .check()
+    }
+    
+    func testBogusSwiftUIEmptyLayout() {
+        SwiftUITest {
+            HStack {
+                FakeText(id: 1, size: 6000)
+                Spacer()
+                Rect(2).fixedSize()
+            }
+        }
+        .check()
+    }
+    
+    func testOrphanSpacer() {
+        SwiftUITest {
+            Spacer()
+                .background(Rect(1))
+        }
+        .check()
+    }
+    
+    func testSpacerFixedSize() {
+        SwiftUITest {
+            VStack {
+                Spacer()
+                    .background(Rect(1))
+                    .fixedSize()
+                
+                Rect(2)
+            }
+        }
+        .check()
+    }
+    
+    func testOrphanSpacerFixedSize() {
+        SwiftUITest {
+            Spacer()
+                .background(Rect(1))
+                .fixedSize()
+        }
+        .check()
+    }
+
+    func testFakeTextComplex() {
+        SwiftUITest {
+            VStack(spacing: 8) {
+                // Row 1: text beside a fixed icon — text wraps into the remaining width
+                HStack(spacing: 8) {
+                    Rect(1).frame(width: 32, height: 32)
+                    VStack(spacing: 4) {
+                        FakeText(id: 2, size: 6000)
+                        FakeText(id: 3, size: 800)
+                    }
+                }
+
+                // Row 2: two texts competing for width — equal share, different wrap heights
+                HStack(spacing: 8) {
+                    FakeText(id: 4, size: 3200)
+                    FakeText(id: 5, size: 900)
+                }
+
+                // Row 3: text + spacer + badge — spacer pushes badge to trailing edge,
+                // text gets the remaining width after the spacer minimum is reserved
+                HStack(spacing: 6) {
+                    FakeText(id: 6, size: 2400)
+                    Spacer(minLength: 8)
+                    Rect(7).frame(width: 24, height: 24)
+                }
+
+                // Row 4: fixed-size text — uses single-line ideal width regardless of container
+                HStack(spacing: 8) {
+                    FakeText(id: 8, size: 600).fixedSize()
+                    Rect(9).frame(maxWidth: .infinity, minHeight: 20)
+                }
+
+                // Row 5: three texts with different sizes in a constrained HStack,
+                // then the whole row wrapped in fixedSize so the HStack takes ideal height
+                HStack(spacing: 6) {
+                    FakeText(id: 10, size: 4000)
+                    FakeText(id: 11, size: 1500)
+                    FakeText(id: 12, size: 2500)
+                }
+                .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .setSize(CGSize(width: 300, height: 500))
         .check()
     }
 }
