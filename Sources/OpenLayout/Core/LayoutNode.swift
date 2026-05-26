@@ -30,44 +30,6 @@ public struct ProposedSize: Sendable, Hashable {
     public static let infinity = Self(width: .infinity, height: .infinity)
 }
 
-public protocol ChildMeasurement {
-    func sizeThatFits(proposal: ProposedSize) -> CGSize
-    func layoutPriority() -> Int
-}
-
-public protocol ChildPlacement: ChildMeasurement {
-    func place(frame: CGRect)
-}
-
-public protocol ContainerLayout {
-    func sizeThatFits(_ children: [ChildMeasurement], proposal: ProposedSize) -> CGSize
-    func placeChildren(_ children: [ChildPlacement], bounds: CGRect)
-    
-    func layoutDirection() -> Axis?
-}
-
-extension ContainerLayout {
-    public func layoutDirection() -> Axis? {
-        nil
-    }
-}
-
-public protocol UnaryLayout {
-    func sizeThatFits(_ child: some ChildMeasurement, proposal: ProposedSize) -> CGSize
-    func placeChild(_ child: some ChildPlacement, bounds: CGRect)
-}
-
-public protocol LeafLayout {
-    func sizeThatFits(proposal: ProposedSize) -> CGSize
-    func layoutPriority() -> Int
-}
-
-extension LeafLayout {
-    public func layoutPriority() -> Int {
-        0
-    }
-}
-
 public struct LayoutIssue: CustomStringConvertible {
     public let message: String
 
@@ -114,43 +76,49 @@ public struct LayoutContext {
 public final class LayoutNode: ChildPlacement, CustomStringConvertible {
     public let id: NodeID
     private let issueRecorder: LayoutIssueRecorder
-
+    
+    private let layout: any Layout
+    public let children: [LayoutNode]
+    public let leafData: Any?
+    
     public private(set) var frame: CGRect?
-    private let layout: LayoutStorage
     private var sizeThatFitsCache: [ProposedSize: CGSize] = [:]
     
-    public var children: [LayoutNode] {
-        self.layout.children
-    }
-
-    private init(context: LayoutContext, layout: LayoutStorage) {
+    private init(
+        context: LayoutContext,
+        layout: any Layout,
+        children: [LayoutNode],
+        leafData: Any? = nil
+    ) {
         self.id = context.makeNodeID()
-        self.issueRecorder = context.issueRecorder
         self.layout = layout
+        self.issueRecorder = context.issueRecorder
+        self.leafData = leafData
+        self.children = children
     }
 
     public static func makeLeafNode(
         context: LayoutContext,
-        layout: LeafLayout,
+        layout: some LeafLayout,
         data: Any?
     ) -> LayoutNode {
-        LayoutNode(context: context, layout: LeafLayoutStorage(layout: layout, data: data))
+        LayoutNode(context: context, layout: LeafLayoutAdapter(layout: layout), children: [], leafData: data)
     }
 
     public static func makeContainerNode(
         context: LayoutContext,
-        layout: ContainerLayout,
+        layout: Layout,
         children: [LayoutNode]
     ) -> LayoutNode {
-        LayoutNode(context: context, layout: ContainerLayoutStorage(children: children, layout: layout))
+        LayoutNode(context: context, layout: layout, children: children)
     }
 
     public static func makeUnaryNode(
         context: LayoutContext,
-        layout: UnaryLayout,
+        layout: some UnaryLayout,
         child: LayoutNode
     ) -> LayoutNode {
-        LayoutNode(context: context, layout: UnaryLayoutStorage(child: child, layout: layout))
+        LayoutNode(context: context, layout: UnaryLayoutAdapter(layout: layout), children: [child])
     }
 
     public func doLayout() {
@@ -159,9 +127,9 @@ public final class LayoutNode: ChildPlacement, CustomStringConvertible {
             return
         }
 
-        self.layout.placeChildren(bounds: frame)
+        self.layout.placeChildren(self.children, bounds: frame)
 
-        for child in self.layout.children {
+        for child in self.children {
             if child.frame == nil {
                 self.issueRecorder.recordError("layout: Frame is not placed for child node \(child) of node \(self)")
             }
@@ -169,16 +137,28 @@ public final class LayoutNode: ChildPlacement, CustomStringConvertible {
             child.doLayout()
         }
     }
+    
+    public func layoutPriority() -> Int {
+        self.layout.layoutPriority()
+    }
+    
+    public var description: String {
+        "<LayoutNode id=\(self.id); \(self.children.count) children; layout=\(self.layout)>"
+    }
+    
+    // MARK: ChildMeasurement
 
     public func sizeThatFits(proposal: ProposedSize) -> CGSize {
         if let cachedSize = self.sizeThatFitsCache[proposal] {
             return cachedSize
         }
         
-        let size = self.layout.sizeThatFits(proposal: proposal)
+        let size = self.layout.sizeThatFits(self.children, proposal: proposal)
         self.sizeThatFitsCache[proposal] = size
         return size
     }
+    
+    // MARK: ChildPlacement
 
     public func place(frame: CGRect) {
         guard self.frame == nil else {
@@ -187,108 +167,5 @@ public final class LayoutNode: ChildPlacement, CustomStringConvertible {
         }
 
         self.frame = frame
-    }
-    
-    public var leafData: Any? {
-        guard let leafLayout = self.layout as? LeafLayoutStorage else {
-            return nil
-        }
-        
-        return leafLayout.data
-    }
-    
-    public func layoutPriority() -> Int {
-        self.layout.layoutPriority()
-    }
-    
-    public var description: String {
-        "<LayoutNode id=\(self.id); \(self.layout.children.count) children; layout=\(self.layout)>"
-    }
-}
-
-private protocol LayoutStorage {
-    var children: [LayoutNode] { get }
-
-    func sizeThatFits(proposal: ProposedSize) -> CGSize
-    func layoutPriority() -> Int
-    func placeChildren(bounds: CGRect)
-}
-
-extension LayoutStorage {
-    func layoutPriority() -> Int {
-        0
-    }
-}
-
-private struct ContainerLayoutStorage: LayoutStorage, CustomStringConvertible {
-    private let layout: ContainerLayout
-
-    let children: [LayoutNode]
-
-    init(children: [LayoutNode], layout: ContainerLayout) {
-        self.children = children
-        self.layout = layout
-    }
-
-    func sizeThatFits(proposal: ProposedSize) -> CGSize {
-        self.layout.sizeThatFits(self.children, proposal: proposal)
-    }
-
-    func placeChildren(bounds: CGRect) {
-        self.layout.placeChildren(self.children, bounds: bounds)
-    }
-    
-    var description: String {
-        "\(type(of: self.layout))"
-    }
-}
-
-private struct UnaryLayoutStorage: LayoutStorage, CustomStringConvertible {
-    private let child: LayoutNode
-    private let layout: UnaryLayout
-
-    var children: [LayoutNode] { [self.child] }
-
-    init(child: LayoutNode, layout: UnaryLayout) {
-        self.child = child
-        self.layout = layout
-    }
-
-    func sizeThatFits(proposal: ProposedSize) -> CGSize {
-        self.layout.sizeThatFits(self.child, proposal: proposal)
-    }
-
-    func placeChildren(bounds: CGRect) {
-        self.layout.placeChild(self.child, bounds: bounds)
-    }
-    
-    var description: String {
-        "\(type(of: self.layout))"
-    }
-}
-
-private struct LeafLayoutStorage: LayoutStorage, CustomStringConvertible {
-    private let layout: LeafLayout
-    let data: Any?
-
-    var children: [LayoutNode] { [] }
-
-    init(layout: LeafLayout, data: Any?) {
-        self.layout = layout
-        self.data = data
-    }
-
-    func sizeThatFits(proposal: ProposedSize) -> CGSize {
-        self.layout.sizeThatFits(proposal: proposal)
-    }
-    
-    func layoutPriority() -> Int {
-        self.layout.layoutPriority()
-    }
-
-    func placeChildren(bounds: CGRect) {}
-    
-    var description: String {
-        "\(type(of: self.layout))"
     }
 }

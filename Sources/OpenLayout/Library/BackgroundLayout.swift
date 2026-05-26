@@ -7,7 +7,7 @@
 
 import CoreGraphics
 
-public struct BackgroundLayout: ContainerLayout {
+public struct BackgroundLayout: Layout {
     public init() {}
 
     public func sizeThatFits(_ children: [ChildMeasurement], proposal: ProposedSize) -> CGSize {

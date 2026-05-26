@@ -8,7 +8,7 @@
 import OpenLayout
 
 public protocol Container {
-    associatedtype Layout: ContainerLayout
+    associatedtype Layout: OpenLayout.Layout
     
     func makeLayout() -> Layout
 }
@@ -37,7 +37,7 @@ struct UnaryContainerItem<Layout: UnaryLayout>: LayoutItem {
     }
 }
 
-struct ContainerItem<Layout: ContainerLayout>: LayoutItem {
+struct ContainerItem<Layout: OpenLayout.Layout>: LayoutItem {
     let layout: Layout
     let children: [any LayoutItem]
     

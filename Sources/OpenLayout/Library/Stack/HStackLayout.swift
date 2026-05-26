@@ -7,7 +7,7 @@
 
 import CoreGraphics
 
-public struct HStackLayout: ContainerLayout {
+public struct HStackLayout: Layout {
     public let alignment: Alignment.Vertical
     public let spacing: CGFloat
     private let engine: StackLayoutEngine
