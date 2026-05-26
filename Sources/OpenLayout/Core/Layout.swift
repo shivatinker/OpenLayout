@@ -9,6 +9,29 @@ import CoreFoundation
 
 // MARK: Types
 
+public struct ProposedSize: Sendable, Hashable {
+    public let width: CGFloat?
+    public let height: CGFloat?
+
+    public init(width: CGFloat?, height: CGFloat?) {
+        self.width = width
+        self.height = height
+    }
+
+    public init(_ size: CGSize) {
+        self.width = size.width
+        self.height = size.height
+    }
+
+    public func replacingUnspecifiedDimensions(by size: CGSize) -> CGSize {
+        CGSize(width: self.width ?? size.width, height: self.height ?? size.height)
+    }
+
+    public static let unspecified = Self(width: nil, height: nil)
+    public static let zero = Self(width: 0, height: 0)
+    public static let infinity = Self(width: .infinity, height: .infinity)
+}
+
 public protocol ChildMeasurement {
     func sizeThatFits(proposal: ProposedSize) -> CGSize
     func layoutPriority() -> Int
