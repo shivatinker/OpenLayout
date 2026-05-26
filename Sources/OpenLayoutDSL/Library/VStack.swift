@@ -14,7 +14,10 @@ public struct VStack: Container {
     private let spacing: CGFloat
     private let alignment: Alignment.Horizontal
 
-    public init(alignment: Alignment.Horizontal = .center, spacing: CGFloat = 8) {
+    public init(
+        alignment: Alignment.Horizontal = .center,
+        spacing: CGFloat = LayoutConfiguration.defaultVStackSpacing
+    ) {
         self.alignment = alignment
         self.spacing = spacing
     }

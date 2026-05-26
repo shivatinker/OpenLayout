@@ -15,6 +15,14 @@ let package = Package(
             name: "OpenLayoutDSL",
             targets: ["OpenLayoutDSL"]
         ),
+        .library(
+            name: "RuneUI",
+            targets: ["RuneUI"]
+        ),
+        .executable(
+            name: "RuneDemo",
+            targets: ["RuneDemo"]
+        ),
     ],
     targets: [
         .target(
@@ -23,6 +31,16 @@ let package = Package(
         .target(
             name: "OpenLayoutDSL",
             dependencies: ["OpenLayout"]
+        ),
+        .target(
+            name: "RuneUI",
+            dependencies: ["OpenLayout", "OpenLayoutDSL"],
+            exclude: ["Examples"]
+        ),
+        .executableTarget(
+            name: "RuneDemo",
+            dependencies: ["RuneUI"],
+            path: "Sources/RuneUI/Examples/RuneDemo"
         ),
         .testTarget(
             name: "OpenLayoutTests",
