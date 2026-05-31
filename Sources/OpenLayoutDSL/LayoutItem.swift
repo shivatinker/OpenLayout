@@ -7,20 +7,14 @@
 
 import OpenLayout
 
-public protocol LayoutItem {
+public protocol LayoutItem { // Like SwiftUI.View
     func makeLayoutNode(context: LayoutContext) -> LayoutNode
 }
 
 public protocol BodyLayoutItem: LayoutItem {
-    associatedtype Content: LayoutItem = Never
+    associatedtype Content: LayoutItem
     
     var body: Content { get }
-}
-
-extension Never: BodyLayoutItem {
-    public var body: Never {
-        fatalError("Should not be called")
-    }
 }
 
 extension BodyLayoutItem {

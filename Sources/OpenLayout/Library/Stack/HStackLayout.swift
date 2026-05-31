@@ -15,7 +15,7 @@ public struct HStackLayout: Layout {
     public init(alignment: Alignment.Vertical = .center, spacing: CGFloat) {
         self.alignment = alignment
         self.spacing = spacing
-        self.engine = StackLayoutEngine(spacing: spacing, axis: .horizontal, alignment: alignment.stackAlignment)
+        self.engine = StackLayoutEngine(spacing: spacing, majorAxis: .horizontal, alignment: alignment.stackAlignment)
     }
 
     public func sizeThatFits(_ children: [ChildMeasurement], proposal: ProposedSize) -> CGSize {

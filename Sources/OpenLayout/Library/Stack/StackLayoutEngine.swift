@@ -15,24 +15,24 @@ enum StackAlignment {
 
 struct StackLayoutEngine {
     let spacing: CGFloat
-    let axis: Axis
+    let majorAxis: Axis
     let alignment: StackAlignment
 
-    var crossAxis: Axis {
-        self.axis.crossAxis
+    var minorAxis: Axis {
+        self.majorAxis.perpendicular
     }
 
     func sizeThatFits(
         _ proposal: ProposedSize,
         children: [any ChildMeasurement]
     ) -> CGSize {
-        guard let availableLength = proposal.length(self.axis) else {
+        guard let availableLength = proposal.length(self.majorAxis) else {
             let childProposal = ProposedSize(
-                axis: self.axis,
+                axis: self.majorAxis,
                 length: nil,
-                crossLength: proposal.length(self.crossAxis)
+                minorLength: proposal.length(self.minorAxis)
             )
-            
+
             return self.sizeThatFits(
                 childrenSizes: children.map { $0.sizeThatFits(proposal: childProposal) }
             )
@@ -41,7 +41,7 @@ struct StackLayoutEngine {
         let layout = self.layout(
             children: children,
             availableLength: availableLength,
-            crossLengthProposal: proposal.length(self.crossAxis)
+            minorLengthProposal: proposal.length(self.minorAxis)
         )
 
         return self.sizeThatFits(childrenSizes: layout.map(\.size))
@@ -49,11 +49,11 @@ struct StackLayoutEngine {
 
     private func sizeThatFits(childrenSizes: [CGSize]) -> CGSize {
         let totalSpacing = self.spacing * CGFloat(childrenSizes.count - 1)
-        
+
         return CGSize(
-            axis: self.axis,
-            length: childrenSizes.map { $0.length(self.axis) }.reduce(0, +) + totalSpacing,
-            crossLength: childrenSizes.map { $0.length(self.crossAxis) }.reduce(0, max)
+            axis: self.majorAxis,
+            majorLength: childrenSizes.map { $0.length(self.majorAxis) }.reduce(0, +) + totalSpacing,
+            minorLength: childrenSizes.map { $0.length(self.minorAxis) }.reduce(0, max)
         )
     }
 
@@ -63,8 +63,8 @@ struct StackLayoutEngine {
     ) {
         let layout = self.layout(
             children: children,
-            availableLength: frame.length(self.axis),
-            crossLengthProposal: frame.length(self.crossAxis)
+            availableLength: frame.length(self.majorAxis),
+            minorLengthProposal: frame.length(self.minorAxis)
         )
 
         var cursor = frame.origin
@@ -73,12 +73,12 @@ struct StackLayoutEngine {
             self.placeChild(
                 children[index],
                 cursor: cursor,
-                crossAxisLength: frame.length(self.crossAxis),
+                minorAxisLength: frame.length(self.minorAxis),
                 element: element
             )
 
-            cursor.modifyCoordinate(self.axis) {
-                $0 += element.size.length(self.axis) + self.spacing
+            cursor.modifyCoordinate(self.majorAxis) {
+                $0 += element.size.length(self.majorAxis) + self.spacing
             }
         }
     }
@@ -86,17 +86,17 @@ struct StackLayoutEngine {
     private func placeChild(
         _ child: some ChildPlacement,
         cursor: CGPoint,
-        crossAxisLength: CGFloat,
+        minorAxisLength: CGFloat,
         element: CalculatedElement
     ) {
         child.place(
             at: CGPoint(
-                self.axis,
-                coordinate: cursor.coordinate(self.axis) + element.size.length(self.axis) / 2.0,
-                crossCoordinate: self.placementCrossCoordinate(
-                    coordinate: cursor.coordinate(self.crossAxis),
-                    elementCrossAxisLength: element.size.length(self.crossAxis),
-                    crossAxisLength: crossAxisLength
+                self.majorAxis,
+                coordinate: cursor.coordinate(self.majorAxis) + element.size.length(self.majorAxis) / 2.0,
+                crossCoordinate: self.placementMinorCoordinate(
+                    coordinate: cursor.coordinate(self.minorAxis),
+                    elementMinorAxisLength: element.size.length(self.minorAxis),
+                    minorAxisLength: minorAxisLength
                 )
             ),
             anchor: .center,
@@ -104,18 +104,18 @@ struct StackLayoutEngine {
         )
     }
 
-    private func placementCrossCoordinate(
+    private func placementMinorCoordinate(
         coordinate: CGFloat,
-        elementCrossAxisLength: CGFloat,
-        crossAxisLength: CGFloat
+        elementMinorAxisLength: CGFloat,
+        minorAxisLength: CGFloat
     ) -> CGFloat {
         switch self.alignment {
         case .min:
-            coordinate + elementCrossAxisLength / 2.0
+            coordinate + elementMinorAxisLength / 2.0
         case .center:
-            coordinate + crossAxisLength / 2.0
+            coordinate + minorAxisLength / 2.0
         case .max:
-            coordinate + crossAxisLength - elementCrossAxisLength / 2.0
+            coordinate + minorAxisLength - elementMinorAxisLength / 2.0
         }
     }
 
@@ -127,7 +127,7 @@ struct StackLayoutEngine {
     private func layout(
         children: [any ChildMeasurement],
         availableLength: CGFloat,
-        crossLengthProposal: CGFloat?
+        minorLengthProposal: CGFloat?
     ) -> [CalculatedElement] {
         struct Group {
             let priority: Int
@@ -150,12 +150,12 @@ struct StackLayoutEngine {
             let lowerMinLength = groups[(index + 1)...]
                 .flatMap(\.indices)
                 .reduce(0.0) { total, idx in
-                    total + self.minLength(of: children[idx], crossLengthProposal: crossLengthProposal)
+                    total + self.minLength(of: children[idx], minorLengthProposal: minorLengthProposal)
                 }
 
             let sortedIndices = group.indices.sorted {
-                self.flexibility(for: children[$0], crossLengthProposal: crossLengthProposal) <
-                    self.flexibility(for: children[$1], crossLengthProposal: crossLengthProposal)
+                self.flexibility(for: children[$0], minorLengthProposal: minorLengthProposal) <
+                    self.flexibility(for: children[$1], minorLengthProposal: minorLengthProposal)
             }
 
             var groupCount = sortedIndices.count
@@ -164,11 +164,11 @@ struct StackLayoutEngine {
                 let spacingReservation = self.spacing * CGFloat(remainingCount - 1)
                 let proposedLength = max(remainingLength - lowerMinLength - spacingReservation, 0) / CGFloat(groupCount)
 
-                let proposal = ProposedSize(axis: self.axis, length: proposedLength, crossLength: crossLengthProposal)
+                let proposal = ProposedSize(axis: self.majorAxis, length: proposedLength, minorLength: minorLengthProposal)
                 let size = children[index].sizeThatFits(proposal: proposal)
 
                 result[index] = CalculatedElement(proposal: proposal, size: size)
-                remainingLength = max(remainingLength - size.length(self.axis) - self.spacing, 0)
+                remainingLength = max(remainingLength - size.length(self.majorAxis) - self.spacing, 0)
                 remainingCount -= 1
                 groupCount -= 1
             }
@@ -177,23 +177,23 @@ struct StackLayoutEngine {
         return result
     }
 
-    private func minLength(of element: any ChildMeasurement, crossLengthProposal: CGFloat?) -> CGFloat {
+    private func minLength(of element: any ChildMeasurement, minorLengthProposal: CGFloat?) -> CGFloat {
         element.sizeThatFits(proposal: ProposedSize(
-            axis: self.axis, length: 0, crossLength: crossLengthProposal
-        )).length(self.axis)
+            axis: self.majorAxis, length: 0, minorLength: minorLengthProposal
+        )).length(self.majorAxis)
     }
 
     private func flexibility(
         for element: any ChildMeasurement,
-        crossLengthProposal: CGFloat?
+        minorLengthProposal: CGFloat?
     ) -> CGFloat {
         let minLength = element.sizeThatFits(proposal: ProposedSize(
-            axis: self.axis, length: 0, crossLength: crossLengthProposal
-        )).length(self.axis)
+            axis: self.majorAxis, length: 0, minorLength: minorLengthProposal
+        )).length(self.majorAxis)
 
         let maxLength = element.sizeThatFits(proposal: ProposedSize(
-            axis: self.axis, length: .infinity, crossLength: crossLengthProposal
-        )).length(self.axis)
+            axis: self.majorAxis, length: .infinity, minorLength: minorLengthProposal
+        )).length(self.majorAxis)
 
         return maxLength - minLength
     }
@@ -241,10 +241,10 @@ extension ProposedSize {
         }
     }
 
-    init(axis: Axis, length: CGFloat?, crossLength: CGFloat?) {
+    init(axis: Axis, length: CGFloat?, minorLength: CGFloat?) {
         switch axis {
-        case .horizontal: self.init(width: length, height: crossLength)
-        case .vertical: self.init(width: crossLength, height: length)
+        case .horizontal: self.init(width: length, height: minorLength)
+        case .vertical: self.init(width: minorLength, height: length)
         }
     }
 }
@@ -257,10 +257,10 @@ extension CGSize {
         }
     }
 
-    init(axis: Axis, length: CGFloat, crossLength: CGFloat) {
+    init(axis: Axis, majorLength: CGFloat, minorLength: CGFloat) {
         switch axis {
-        case .horizontal: self.init(width: length, height: crossLength)
-        case .vertical: self.init(width: crossLength, height: length)
+        case .horizontal: self.init(width: majorLength, height: minorLength)
+        case .vertical: self.init(width: minorLength, height: majorLength)
         }
     }
 }

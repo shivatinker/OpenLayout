@@ -11,12 +11,24 @@ import OpenLayout
 extension LayoutItem {
     @available(*, unavailable, message: "Please pass at least one dimension parameter")
     public func frame() -> some LayoutItem {
-        fatalError()
+        UnaryContainerItem(
+            layout: FixedFrameLayout(width: nil, height: nil, alignment: .center),
+            child: self
+        )
     }
 
     @available(*, unavailable, message: "Please pass at least one dimension parameter")
     public func frame(alignment: Alignment) -> some LayoutItem {
-        fatalError()
+        UnaryContainerItem(
+            layout: FlexibleFrameLayout(
+                minWidth: nil,
+                maxWidth: nil,
+                minHeight: nil,
+                maxHeight: nil,
+                alignment: alignment
+            ),
+            child: self
+        )
     }
 
     @_disfavoredOverload

@@ -11,11 +11,11 @@ public enum Axis {
     case horizontal
     case vertical
     
-    public var crossAxis: Axis {
+    public var perpendicular: Axis {
         switch self {
         case .horizontal:
             .vertical
-            
+
         case .vertical:
             .horizontal
         }

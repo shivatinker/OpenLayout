@@ -21,6 +21,8 @@ final class RuneDemo {
         rune.draw(self.body)
     }
     
+    private let longText = "This is very very very very long text! This is very very very very long text! This is very very very very long text! This is very very very very long text! This is very very very very long text! This is very very very very long text!"
+    
     private var body: LayoutItem {
         VStack {
             Text("Rune demo!")
@@ -33,7 +35,7 @@ final class RuneDemo {
                     .padding(1)
                     .background(Box())
                 
-                Text("This is very very very very long text! This is very very very very long text! This is very very very very long text! This is very very very very long text! This is very very very very long text! This is very very very very long text!")
+                Text(self.longText)
                     .padding(1)
                     .background(Box())
             }
